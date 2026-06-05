@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,12 +7,9 @@
     <title>Ninja Tap & Earn</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&display=swap" rel="stylesheet">
     
-    <!-- TELEGRAM WEB APP SDK ONLY -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- OFFICIAL MONETAG SMART TAG INTEGRATION -->
-    <script>(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://iclickcdn.com/tag.min.js',11090557,document.body||document.documentElement)</script>
-
     <style>
         * {
             box-sizing: border-box;
@@ -66,11 +64,11 @@
 
         .score-board {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .coin-balance {
-            font-size: 36px;
+            font-size: 34px;
             color: #fdcb6e;
             text-shadow: 0 0 20px rgba(253, 203, 110, 0.5);
             margin-bottom: 2px;
@@ -91,8 +89,8 @@
         }
 
         .character-glow {
-            width: 180px;
-            height: 180px;
+            width: 170px;
+            height: 170px;
             background: rgba(0, 206, 201, 0.1);
             border-radius: 50%;
             display: flex;
@@ -110,26 +108,26 @@
         }
 
         .character-emoji {
-            font-size: 100px;
+            font-size: 90px;
             filter: drop-shadow(0 0 10px #00cec9);
         }
 
         .energy-section {
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .energy-text {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             margin-bottom: 5px;
             color: #dfe6e9;
         }
 
         .progress-bar-bg {
             width: 100%;
-            height: 12px;
+            height: 10px;
             background: #2d3436;
             border-radius: 6px;
             overflow: hidden;
@@ -143,65 +141,91 @@
             transition: width 0.1s ease;
         }
 
+        /* Referral UI Box */
+        .referral-box {
+            background: rgba(162, 155, 254, 0.06);
+            border: 1px dashed #6c5ce7;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .ref-title {
+            font-size: 11px;
+            color: #a29bfe;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .ref-btn {
+            width: 100%;
+            padding: 8px;
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         .wallet-container {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 12px;
-            margin-bottom: 15px;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 5px;
         }
 
         .wallet-title {
-            font-size: 11px;
+            font-size: 10px;
             color: #a29bfe;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .wallet-select {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             background: #171821;
             color: white;
             border: 1px solid #391c6d;
-            border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
-            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-bottom: 8px;
             outline: none;
         }
 
         .input-box {
             display: none;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .dynamic-input {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             background: #0d0e15;
             color: #00cec9;
             border: 1px solid #391c6d;
-            border-radius: 8px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
+            border-radius: 6px;
+            font-size: 11px;
             outline: none;
         }
 
         .action-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .game-btn {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             text-align: center;
             text-transform: uppercase;
@@ -209,21 +233,20 @@
 
         .btn-ad {
             background: linear-gradient(135deg, #d63031, #e17055);
-            box-shadow: 0 4px 10px rgba(214, 48, 49, 0.3);
         }
 
         .btn-withdraw {
             background: linear-gradient(135deg, #00b894, #00cec9);
-            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
+        
         <div class="top-bar">
             <div class="stat-box">Rate<br><span class="stat-val">10K = $1</span></div>
-            <div class="stat-box" style="text-align: right;">Rank<br><span class="stat-val">Elite Ninja</span></div>
+            <div class="stat-box" style="text-align: right;">Ref Bonus<br><span class="stat-val">+$0.20</span></div>
         </div>
 
         <div class="score-board">
@@ -247,13 +270,17 @@
             </div>
         </div>
 
+        <div class="referral-box">
+            <div class="ref-title">🔗 Invite Friends & Get $0.20 (2,000 Coins)</div>
+            <button class="ref-btn" onclick="copyReferralLink()">📋 Copy My Referral Link</button>
+        </div>
+
         <div class="wallet-container">
             <div class="wallet-title">👛 Choose Payout Method</div>
             <select id="wallet-select" class="wallet-select" onchange="handleSelectChange()">
                 <option value="none">-- Choose Option --</option>
                 <option value="UPI">🇮🇳 UPI (Paytm/PhonePe/GPay)</option>
                 <option value="Tonkeeper">💎 Tonkeeper Wallet</option>
-                <option value="Telegram Wallet">✈️ Telegram Wallet</option>
             </select>
 
             <div id="payout-input-container" class="input-box">
@@ -265,6 +292,7 @@
                 <button class="game-btn btn-withdraw" id="withdraw-btn" onclick="handleWithdrawal()">💰 Withdraw</button>
             </div>
         </div>
+
     </div>
 
     <script>
@@ -272,25 +300,60 @@
         WebApp.ready();
         WebApp.expand();
 
-        const userTelegramName = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.first_name : "Test User";
-        const userTelegramID = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.id : "123456";
+        const userTelegramName = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.first_name : "Ninja User";
+        const userTelegramID = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.id : "777777";
 
-        let coins = 0;
+        // Game Metrics Configuration
+        const CONVERSION_RATE = 10000; // 10,000 Coins = $1
+        const REF_BONUS_COINS = 2000;  // 2,000 Coins = $0.20
+        const MIN_WITHDRAW_USD = 5;
+
+        // LocalStorage logic for state persistence
+        let coins = parseInt(localStorage.getItem(`coins_${userTelegramID}`)) || 0;
         let energy = 100;
-        const CONVERSION_RATE = 10000; 
-        const MIN_WITHDRAW_USD = 5;    
-
         let lastTapTime = 0;
-        const MAX_SPEED_LIMIT = 60; 
+        const MAX_SPEED_LIMIT = 60;
+
+        // --- DYNAMIC REFERRAL CHECK ENGINE ---
+        function checkReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const referrer = urlParams.get('tgWebAppStartParam') || urlParams.get('ref');
+            
+            // Check if user is newly referred and didn't claim bonus yet
+            if (referrer && referrer !== userTelegramID) {
+                const alreadyClaimed = localStorage.getItem(`ref_claimed_${userTelegramID}`);
+                if (!alreadyClaimed) {
+                    coins += REF_BONUS_COINS;
+                    localStorage.setItem(`ref_claimed_${userTelegramID}`, "true");
+                    localStorage.setItem(`coins_${userTelegramID}`, coins);
+                    
+                    // Alerting user nicely inside Telegram WebApp
+                    setTimeout(() => {
+                        alert(`🎉 Referral Bonus Applied!\nYou got +2,000 Coins ($0.20) for joining via Invite Link.`);
+                        updateUI();
+                    }, 1000);
+                }
+            }
+        }
+
+        function copyReferralLink() {
+            // Generates native deep link structure for Telegram Mini App Bots
+            const botUsername = "Ninjatapgamebot"; // <-- YAHAN APNE BOT KA USERNAME DALNA (Bina @ ke)
+            const referralLink = `https://t.me/${botUsername}/start?startapp=${userTelegramID}`;
+            
+            navigator.clipboard.writeText(referralLink).then(() => {
+                alert("🚀 Link copied! Send it to your friends.\nWhen they join and tap, you both get bonuses.");
+            }).catch(() => {
+                // Fail-safe manual input backup selection fallback
+                alert(`Share this link:\n${referralLink}`);
+            });
+        }
 
         function handleTap(event) {
             const currentTime = Date.now();
-            if (lastTapTime !== 0) {
-                const currentInterval = currentTime - lastTapTime;
-                if (currentInterval < MAX_SPEED_LIMIT) {
-                    alert("⚠️ Anti-Cheat Triggered!");
-                    return; 
-                }
+            if (lastTapTime !== 0 && (currentTime - lastTapTime < MAX_SPEED_LIMIT)) {
+                alert("⚠️ Anti-Cheat Triggered!");
+                return; 
             }
             lastTapTime = currentTime;
 
@@ -298,6 +361,7 @@
                 coins += 5; 
                 energy -= 2; 
                 if (energy < 0) energy = 0;
+                localStorage.setItem(`coins_${userTelegramID}`, coins);
                 updateUI();
             } else {
                 alert("Out of Energy! Tap 'Refill' to view an ad.");
@@ -313,39 +377,34 @@
                 inputContainer.style.display = 'none';
             } else {
                 inputContainer.style.display = 'block';
-                if(selectedOpt === 'UPI') {
-                    inputField.placeholder = "Enter UPI ID (e.g., username@okaxis)";
-                } else {
-                    inputField.placeholder = "Enter TON Wallet Address";
-                }
+                inputField.placeholder = selectedOpt === 'UPI' ? "Enter UPI ID (e.g., vpa@paytm)" : "Enter TON Wallet Address";
             }
         }
 
-        // MONETAG DIRECT REWARD SYSTEM
+        // --- ADSGRAM ENGINE BINDING ---
+        const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "int-34137" }) : null;
+
         function watchAdToRefill() {
+            if (!AdController) {
+                alert("Ads SDK is offline. Run inside Telegram Client.");
+                return;
+            }
+
             const adBtn = document.getElementById('ad-btn');
-            adBtn.innerText = "Loading Monetag Ad...";
+            adBtn.innerText = "Loading Ad...";
             adBtn.disabled = true;
 
-            // Monetag dynamic tag initialization trigger
-            if (typeof show_11090557 === 'function') {
-                show_11090557().then(() => {
-                    energy = 100;
-                    updateUI();
-                    alert('🎉 Success! Monetag Ad complete, energy full!');
-                }).catch(() => {
-                    alert('Ad loading error or skipped.');
-                }).finally(() => {
-                    adBtn.innerText = "📺 Refill (Ad)";
-                    adBtn.disabled = false;
-                });
-            } else {
-                // Fallback tag action if script takes time to load in browser
+            AdController.show().then(() => {
                 energy = 100;
                 updateUI();
+                alert('🎉 Success! Energy full 100%!');
+            }).catch((result) => {
+                alert('Ad skipped or Network Busy. Try again later.');
+                console.error("Adsgram tracking object logs:", result);
+            }).finally(() => {
                 adBtn.innerText = "📺 Refill (Ad)";
                 adBtn.disabled = false;
-            }
+            });
         }
 
         function handleWithdrawal() {
@@ -354,28 +413,19 @@
             const currentUSD = coins / CONVERSION_RATE;
 
             if (selectedMethod === "none" || addressValue === "") {
-                alert("Details enter karein!");
+                alert("Kripya saari Details select aur fill karein!");
                 return;
             }
 
             if (currentUSD < MIN_WITHDRAW_USD) {
-                alert(`Min limit $${MIN_WITHDRAW_USD} hai.`);
+                alert(`Min limit $${MIN_WITHDRAW_USD} required.`);
                 return;
             }
 
             const urlParams = new URLSearchParams(window.location.search);
-            let googleScriptID = urlParams.get('sheet');
-            
-            if(!googleScriptID) {
-                googleScriptID = "AKfycbxi_TEST_URL_REPLACE_IF_NEEDED"; 
-            }
+            let googleScriptID = urlParams.get('sheet') || "AKfycbxi_YOUR_REAL_ID_HERE";
 
-            const googleScriptURL = "https://script.google.com/macros/s/" + googleScriptID + "/exec";
-
-            if (googleScriptID.includes("TEST_URL")) {
-                alert("Link me ?sheet=YOUR_ID zaroor lagana BotFather me.");
-                return;
-            }
+            const googleScriptURL = `https://script.google.com/macros/s/${googleScriptID}/exec`;
 
             const wBtn = document.getElementById('withdraw-btn');
             wBtn.innerText = "Processing...";
@@ -398,12 +448,13 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                alert(`🎉 Success! Request submitted.`);
+                alert(`🎉 Payout Request Sent!`);
                 coins = 0; 
+                localStorage.setItem(`coins_${userTelegramID}`, coins);
                 updateUI();
             })
             .catch(() => {
-                alert("Server Error.");
+                alert("Server Connection Error.");
             })
             .finally(() => {
                 wBtn.innerText = "💰 Withdraw";
@@ -419,12 +470,27 @@
             document.getElementById('usd-count').innerText = usdValue.toFixed(2);
         }
 
+        // Energy ticking recovery thread
         setInterval(() => {
             if (energy < 100) {
                 energy += 1;
                 updateUI();
             }
         }, 12000);
+
+        // Initial Runtime Execution
+        window.onload = () => {
+            updateUI();
+            checkReferral();
+        };
     </script>
 </body>
 </html>
+
+        
+            ;
+            
+
+        .
+        
+                 
