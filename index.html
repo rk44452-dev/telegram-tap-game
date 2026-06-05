@@ -1,5 +1,6 @@
 
-<!DOCTYPE html>
+            
+          <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -141,7 +142,6 @@
             transition: width 0.1s ease;
         }
 
-        /* Referral UI Box */
         .referral-box {
             background: rgba(162, 155, 254, 0.06);
             border: 1px dashed #6c5ce7;
@@ -243,7 +243,6 @@
 <body>
 
     <div class="app-container">
-        
         <div class="top-bar">
             <div class="stat-box">Rate<br><span class="stat-val">10K = $1</span></div>
             <div class="stat-box" style="text-align: right;">Ref Bonus<br><span class="stat-val">+$0.20</span></div>
@@ -292,7 +291,6 @@
                 <button class="game-btn btn-withdraw" id="withdraw-btn" onclick="handleWithdrawal()">💰 Withdraw</button>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -303,33 +301,58 @@
         const userTelegramName = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.first_name : "Ninja User";
         const userTelegramID = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.id : "777777";
 
-        // Game Metrics Configuration
-        const CONVERSION_RATE = 10000; // 10,000 Coins = $1
-        const REF_BONUS_COINS = 2000;  // 2,000 Coins = $0.20
+        const CONVERSION_RATE = 10000;
+        const REF_BONUS_COINS = 2000;
         const MIN_WITHDRAW_USD = 5;
 
-        // LocalStorage logic for state persistence
-        let coins = parseInt(localStorage.getItem(`coins_${userTelegramID}`)) || 0;
+        let coins = 0;
         let energy = 100;
         let lastTapTime = 0;
         const MAX_SPEED_LIMIT = 60;
 
-        // --- DYNAMIC REFERRAL CHECK ENGINE ---
+        // Telegram Cloud Storage se coins load karne ka function
+        function loadUserData() {
+            if (WebApp.CloudStorage) {
+                WebApp.CloudStorage.getItem('ninja_coins', (err, value) => {
+                    if (!err && value) {
+                        coins = parseInt(value) || 0;
+                    } else {
+                        // Backup fallback if cloud fails
+                        coins = parseInt(localStorage.getItem(`coins_${userTelegramID}`)) || 0;
+                    }
+                    updateUI();
+                    checkReferral();
+                });
+            } else {
+                coins = parseInt(localStorage.getItem(`coins_${userTelegramID}`)) || 0;
+                updateUI();
+                checkReferral();
+            }
+        }
+
+        // Telegram Cloud Storage mein coins save karne ka function
+        function saveCoinsToTelegram() {
+            localStorage.setItem(`coins_${userTelegramID}`, coins); // Local backup
+            if (WebApp.CloudStorage) {
+                WebApp.CloudStorage.setItem('ninja_coins', coins.toString(), (err, success) => {
+                    if (err) console.error("Telegram Cloud Storage sync failed:", err);
+                });
+            }
+        }
+
         function checkReferral() {
             const urlParams = new URLSearchParams(window.location.search);
             const referrer = urlParams.get('tgWebAppStartParam') || urlParams.get('ref');
             
-            // Check if user is newly referred and didn't claim bonus yet
             if (referrer && referrer !== userTelegramID) {
                 const alreadyClaimed = localStorage.getItem(`ref_claimed_${userTelegramID}`);
                 if (!alreadyClaimed) {
                     coins += REF_BONUS_COINS;
                     localStorage.setItem(`ref_claimed_${userTelegramID}`, "true");
-                    localStorage.setItem(`coins_${userTelegramID}`, coins);
+                    saveCoinsToTelegram();
                     
-                    // Alerting user nicely inside Telegram WebApp
                     setTimeout(() => {
-                        alert(`🎉 Referral Bonus Applied!\nYou got +2,000 Coins ($0.20) for joining via Invite Link.`);
+                        alert(`🎉 Referral Bonus Applied!\nYou got +2,000 Coins ($0.20).`);
                         updateUI();
                     }, 1000);
                 }
@@ -337,14 +360,12 @@
         }
 
         function copyReferralLink() {
-            // Generates native deep link structure for Telegram Mini App Bots
-            const botUsername = "Ninjatapgamebot"; // <-- YAHAN APNE BOT KA USERNAME DALNA (Bina @ ke)
+            const botUsername = "Ninjatapgamebot"; // Apne bot ka username bina @ ke daalein
             const referralLink = `https://t.me/${botUsername}/start?startapp=${userTelegramID}`;
             
             navigator.clipboard.writeText(referralLink).then(() => {
-                alert("🚀 Link copied! Send it to your friends.\nWhen they join and tap, you both get bonuses.");
+                alert("🚀 Link copied! Send it to your friends.");
             }).catch(() => {
-                // Fail-safe manual input backup selection fallback
                 alert(`Share this link:\n${referralLink}`);
             });
         }
@@ -361,8 +382,9 @@
                 coins += 5; 
                 energy -= 2; 
                 if (energy < 0) energy = 0;
-                localStorage.setItem(`coins_${userTelegramID}`, coins);
                 updateUI();
+                
+                saveCoinsToTelegram();
             } else {
                 alert("Out of Energy! Tap 'Refill' to view an ad.");
             }
@@ -381,7 +403,6 @@
             }
         }
 
-        // --- ADSGRAM ENGINE BINDING ---
         const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "int-34137" }) : null;
 
         function watchAdToRefill() {
@@ -400,7 +421,6 @@
                 alert('🎉 Success! Energy full 100%!');
             }).catch((result) => {
                 alert('Ad skipped or Network Busy. Try again later.');
-                console.error("Adsgram tracking object logs:", result);
             }).finally(() => {
                 adBtn.innerText = "📺 Refill (Ad)";
                 adBtn.disabled = false;
@@ -424,7 +444,6 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             let googleScriptID = urlParams.get('sheet') || "AKfycbxi_YOUR_REAL_ID_HERE";
-
             const googleScriptURL = `https://script.google.com/macros/s/${googleScriptID}/exec`;
 
             const wBtn = document.getElementById('withdraw-btn');
@@ -450,7 +469,7 @@
             .then(() => {
                 alert(`🎉 Payout Request Sent!`);
                 coins = 0; 
-                localStorage.setItem(`coins_${userTelegramID}`, coins);
+                saveCoinsToTelegram();
                 updateUI();
             })
             .catch(() => {
@@ -470,7 +489,6 @@
             document.getElementById('usd-count').innerText = usdValue.toFixed(2);
         }
 
-        // Energy ticking recovery thread
         setInterval(() => {
             if (energy < 100) {
                 energy += 1;
@@ -478,14 +496,19 @@
             }
         }, 12000);
 
-        // Initial Runtime Execution
         window.onload = () => {
-            updateUI();
-            checkReferral();
+            loadUserData(); // Telegram Server Storage se fetch karega startup par
         };
     </script>
 </body>
 </html>
+  
+            
+        
+        .
+
+                                     
+             
 
         
             ;
