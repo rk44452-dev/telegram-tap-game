@@ -1,574 +1,492 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ninja Tap - Grandmaster Shinobi Edition</title>
+    <title>Space Adventure - Premium Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght=500;800&display=swap" rel="stylesheet">
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-
     <script src='//libtl.com/sdk.js' data-zone='11090557' data-sdk='show_11090557'></script>
-
     <script src="https://sdk.taddy.pro/web/taddy.min.js" data-pub-id="4e95d659cb46669dbe7d1ac3cf15bb86"></script>
-
     <script src="https://richinfo.co/richpartners/in-page/js/richads-ob.js?pubid=1013762&siteid=398682" async></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Orbitron', sans-serif; user-select: none; }
-        body { background: #0d0e15; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        .app-container { width: 100%; max-width: 420px; height: 100vh; background: radial-gradient(circle at center, #1e1233 0%, #0d0e15 100%); border: 2px solid #391c6d; position: relative; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        body { background: #0b0c16; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        .top-bar { display: flex; justify-content: space-between; background: rgba(255, 255, 255, 0.05); padding: 10px 15px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .stat-box { font-size: 10px; color: #a29bfe; text-transform: uppercase; }
-        .stat-val { font-size: 13px; color: #00cec9; font-weight: bold; }
+        .app-container { width: 100%; max-width: 420px; height: 100vh; background: radial-gradient(circle at center, #1b133a 0%, #080911 100%); border: 2px solid #2a1b54; position: relative; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto; }
         
-        .score-board { text-align: center; margin-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .coin-balance { font-size: 32px; color: #fdcb6e; text-shadow: 0 0 20px rgba(253, 203, 110, 0.5); font-weight: 800; }
-        .rank-badge { font-size: 11px; color: #00cec9; background: rgba(0, 206, 201, 0.15); padding: 3px 10px; border-radius: 20px; border: 1px solid #00cec9; margin-top: 2px; text-transform: uppercase; }
-        .premium-balance { font-size: 13px; color: #e056fd; font-weight: bold; margin-top: 4px; }
-
-        .click-area { display: flex; justify-content: center; align-items: center; flex-grow: 1; }
-        .character-glow { width: 160px; height: 160px; background: rgba(0, 206, 201, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 30px rgba(0, 206, 201, 0.2); border: 2px solid #00cec9; cursor: pointer; transition: transform 0.05s; }
-        .character-glow:active { transform: scale(0.92); }
-        .character-emoji { font-size: 75px; }
-
-        .energy-section { width: 100%; margin-bottom: 8px; }
-        .energy-text { display: flex; justify-content: space-between; font-size: 11px; color: #dfe6e9; margin-bottom: 4px; }
-        .progress-bar-bg { width: 100%; height: 10px; background: #2d3436; border-radius: 6px; overflow: hidden; }
-        .progress-bar-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #00cec9, #0984e3); transition: width 0.1s ease; }
-
-        .menu-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
-        .row-grid { display: flex; gap: 6px; width: 100%; }
-        .tab-btn { flex: 1; padding: 10px; background: #22173b; border: 1px solid #391c6d; border-radius: 12px; color: white; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .tab-btn:active { transform: scale(0.95); }
-
-        .wallet-container { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 10px; }
-        .wallet-title { font-size: 10px; color: #a29bfe; margin-bottom: 4px; text-transform: uppercase; }
-        .wallet-select { width: 100%; padding: 8px; background: #171821; color: white; border: 1px solid #391c6d; border-radius: 8px; font-size: 11px; margin-bottom: 6px; outline: none; }
-        .input-box { display: none; margin-bottom: 6px; }
-        .dynamic-input { width: 100%; padding: 8px; background: #0d0e15; color: #00cec9; border: 1px solid #391c6d; border-radius: 6px; font-size: 11px; outline: none; }
-        .game-btn { width: 100%; padding: 10px; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 11px; cursor: pointer; text-transform: uppercase; background: linear-gradient(135deg, #00b894, #00cec9); }
+        /* Premium Space Top Bar */
+        .space-header { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; margin-top: 5px; }
+        .token-row { display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 14px; color: #e056fd; font-weight: bold; }
+        .buy-badge { background: #e056fd; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; cursor: pointer; }
+        .main-coin-display { font-size: 34px; color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.4); font-weight: 800; display: flex; align-items: center; gap: 5px; }
+        .withdraw-badge { background: transparent; border: 1px solid #f1c40f; color: #f1c40f; font-size: 10px; padding: 2px 6px; border-radius: 5px; margin-left: 5px; cursor: pointer; }
         
-        .overlay-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 14, 21, 0.96); z-index: 9999; justify-content: center; align-items: center; padding: 15px; }
-        .glass-card { width: 100%; max-width: 360px; background: linear-gradient(135deg, #1e272e 0%, #0f141c 100%); border: 3px solid #00cec9; border-radius: 24px; padding: 20px; text-align: center; position: relative; box-shadow: 0 0 30px rgba(0, 206, 201, 0.2); }
-        .close-icon { position: absolute; top: -12px; right: -12px; width: 34px; height: 34px; background: #ff4757; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; border: 2px solid white; }
-        .card-heading { font-size: 18px; color: white; margin-bottom: 10px; text-transform: uppercase; font-weight: 800; }
-        
-        .item-icon-wrapper { width: 70px; height: 70px; background: rgba(255,255,255,0.05); border: 2px solid #391c6d; border-radius: 18px; display: flex; justify-content: center; align-items: center; margin: 0 auto 12px auto; }
-        .item-icon-image { font-size: 38px; }
-        .item-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
-        .item-desc { font-size: 11px; color: #b2bec3; margin-bottom: 12px; padding: 0 10px; }
-        .level-stats-box { font-size: 11px; color: #a29bfe; margin-bottom: 15px; background: rgba(255,255,255,0.04); padding: 8px; border-radius: 10px; }
+        /* Storage Capacity Strip */
+        .capacity-strip { background: linear-gradient(90deg, #f1c40f, #f39c12); color: #000; width: 50%; padding: 4px; border-radius: 20px; text-align: center; font-size: 12px; font-weight: bold; margin: 5px auto; box-shadow: 0 0 10px rgba(241,196,15,0.3); }
 
-        .cost-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .price-tag { padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; cursor: pointer; border: none; flex: 1; text-align: center; }
-        .price-gold { background: linear-gradient(to bottom, #f1c40f, #f39c12); }
-        .price-premium { background: linear-gradient(to bottom, #9b59b6, #8e44ad); }
+        /* Central Rocket Stage */
+        .rocket-stage { display: flex; justify-content: space-around; align-items: center; width: 100%; margin: 15px 0; position: relative; }
+        .vertical-gauge { width: 30px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 2px; }
+        .gauge-fill { width: 100%; border-radius: 6px; transition: height 0.3s ease; }
+        .gauge-label { position: absolute; top: -18px; width: 100%; text-align: center; font-size: 9px; color: #a29bfe; }
+        .gauge-icon { text-align: center; font-size: 14px; margin-top: 5px; }
         
-        .or-divider { font-size: 12px; color: #b2bec3; margin-bottom: 10px; font-weight: bold; }
-        .ad-claim-strip { display: block; width: 100%; padding: 12px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); }
+        .rocket-pod { width: 140px; height: 140px; display: flex; justify-content: center; align-items: center; position: relative; }
+        .rocket-art { font-size: 85px; filter: drop-shadow(0 0 20px rgba(155, 89, 182, 0.5)); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-        .nav-arrows-container { display: flex; justify-content: center; gap: 20px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; }
-        .arrow-nav-btn { width: 50px; height: 35px; background: #3498db; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; font-size: 18px; }
+        .collect-btn { background: linear-gradient(135deg, #f39c12, #e67e22); border: none; padding: 10px 35px; border-radius: 15px; color: white; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(230,126,34,0.4); margin-top: 5px; }
+        .collect-btn:active { transform: scale(0.95); }
+
+        /* Icon Grid Side Panels */
+        .side-utilities { display: flex; justify-content: flex-end; gap: 15px; width: 100%; padding-right: 15px; margin-bottom: 10px; }
+        .util-icon-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .util-circle { width: 42px; height: 42px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+
+        /* EXACT SPACE ADVENTURE 5-BUTTON FOOTER NAV */
+        .space-footer-nav { display: flex; justify-content: space-between; width: 100%; gap: 4px; background: rgba(13, 15, 30, 0.9); padding: 8px 4px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
+        .nav-node-btn { flex: 1; padding: 10px 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; color: #b2bec3; font-size: 9px; font-weight: bold; text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.2s; }
+        .nav-node-btn span { font-size: 16px; }
+        .nav-node-btn.active { background: linear-gradient(180deg, #ffb300 0%, #ff8000 100%); color: white; border: none; box-shadow: 0 0 10px rgba(255, 128, 0, 0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+        /* Overlay Screens Setup */
+        .overlay-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 65px); background: rgba(11, 12, 22, 0.98); z-index: 999; flex-direction: column; padding: 15px; overflow-y: auto; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-bottom: 20px; }
+        
+        .day-box { background: #181926; border: 1px solid #2a2b3d; border-radius: 12px; padding: 12px 8px; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .day-box.claimed { border-color: #2ecc71; background: rgba(46, 204, 113, 0.05); }
+        .day-box.claimed::after { content: "✓"; position: absolute; top: 4px; right: 8px; color: #2ecc71; font-weight: bold; font-size: 12px; }
+        .day-box.current-active { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241,196,15,0.2); }
+        
+        .day-title { font-size: 10px; color: #b2bec3; }
+        .day-reward-value { font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 3px; }
+
+        .cooldown-strip { font-size: 11px; color: #ff7675; text-align: center; margin-top: auto; padding: 10px; background: rgba(255,118,117,0.05); border-radius: 10px; width: 100%; }
+        
+        /* Custom Shop UI Overlay */
+        .glass-card { width: 100%; background: #131a26; border: 3px solid #00cec9; border-radius: 24px; padding: 20px; text-align: center; position: relative; box-shadow: 0 0 25px rgba(0, 206, 201, 0.2); margin: auto 0; }
+        .close-icon { position: absolute; top: 12px; right: 15px; font-size: 20px; color: #fff; cursor: pointer; font-weight: bold; }
+        .ad-free-btn { background: #ffffff; color: #202124; padding: 8px 20px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; margin-top: 12px; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; }
+
+        /* Task Item Design */
+        .task-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .task-btn { background: #00cec9; color: black; border: none; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="warning-screen" class="overlay-screen">
-        <div class="glass-card" style="border-color: #ff4757;">
-            <h2 style="color: #ff4757; margin-bottom: 12px;">⚠️ ENGINE INJECTOR ALERT</h2>
-            <p style="font-size: 12px; line-height: 1.6; color: #dfe6e9; margin-bottom: 15px;">Dynamic auto-clicker script environment pattern checked.</p>
-            <button style="background: #ff4757; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="dismissWarning()">Dismiss System Alert</button>
-        </div>
-    </div>
-
     <div class="app-container">
-        <div class="top-bar">
-            <div class="stat-box">Auto Mining<br><span class="stat-val" id="mining-speed-header">0.00/s</span></div>
-            <div class="stat-box" style="text-align: right;">Storage Limit<br><span class="stat-val" id="storage-header">500</span></div>
-        </div>
+        
+        <div id="home-screen-content" style="display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; margin-bottom: 10px;">
+            <div class="space-header">
+                <div style="font-size: 11px; color: #a29bfe; font-weight: bold;">Space Command Center</div>
+                <div class="token-row">
+                    <span>🔮 <span id="premium-display">0</span></span>
+                    <span class="buy-badge" onclick="switchTab('buy')">Buy +</span>
+                </div>
+                <div class="main-coin-display">
+                    🪙 <span id="coin-display">0.00</span>
+                    <span class="withdraw-badge" onclick="togglePayoutScreen(true)">Withdrawal ⌂</span>
+                </div>
+                <div class="capacity-strip" id="capacity-ui">0.00 / 0.00</div>
+            </div>
 
-        <div class="score-board">
-            <div class="coin-balance">🪙 <span id="coin-count">0</span></div>
-            <div class="rank-badge" id="profile-rank-badge">Academy Student (Lvl 1)</div>
-            <div class="premium-balance">🎮 <span id="premium-count">0</span> Gamepad Tokens</div>
-            <div id="referral-status-msg" style="font-size:10px; color:#ff7675; margin-top:4px;"></div>
-        </div>
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <div class="rocket-stage">
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="vertical-gauge">
+                            <div class="gauge-fill" id="fuel-bar" style="height: 0%; background: linear-gradient(#f1c40f, #e67e22);"></div>
+                            <div class="gauge-label" id="fuel-txt">0s</div>
+                        </div>
+                        <div class="gauge-icon">⛽</div>
+                    </div>
 
-        <div class="click-area">
-            <div class="character-glow" onclick="handleTap(event)">
-                <div class="character-emoji">🥷</div>
+                    <div class="rocket-pod" onclick="triggerTapAction()">
+                        <div class="rocket-art">🚀</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="vertical-gauge">
+                            <div class="gauge-fill" id="shield-bar" style="height: 0%; background: linear-gradient(#3498db, #2980b9);"></div>
+                            <div class="gauge-label" id="shield-txt">0%</div>
+                        </div>
+                        <div class="gauge-icon">🛡️</div>
+                    </div>
+                </div>
+
+                <button class="collect-btn" onclick="collectPassiveHoldings()">Collect</button>
+            </div>
+
+            <div class="side-utilities">
+                <div class="util-icon-btn">
+                    <div class="util-circle">🎁</div>
+                    <span style="font-size: 8px;">Giveaways</span>
+                </div>
+                <div class="util-icon-btn" onclick="toggleCalendarScreen(true)">
+                    <div class="util-circle">📅</div>
+                    <span style="font-size: 8px;">Daily</span>
+                </div>
+                <div class="util-icon-btn">
+                    <div class="util-circle">🎡</div>
+                    <span style="font-size: 8px;">Spin</span>
+                </div>
             </div>
         </div>
 
-        <div class="energy-section">
-            <div class="energy-text">
-                <span>⚡ Energy Core (+1 / 30s)</span>
-                <span><span id="energy-count">100</span>/<span id="max-energy-ui">100</span></span>
-            </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="energy-bar"></div>
+        <div id="buy-screen" class="overlay-screen">
+            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">🚀 Upgrades & Boosters</h3>
+            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Upgrade your galactic tech nodes to maximize automatic generation streams.</p>
+            <button class="collect-btn" style="width:100%; margin-bottom:10px;" onclick="openProductionShop(0)">Open Shop Matrix</button>
+        </div>
+
+        <div id="referral-screen" class="overlay-screen">
+            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">👥 Invite Alliances</h3>
+            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Bring alternative commanders into the network logs to secure a 10% premium bonus split.</p>
+            <div style="background: rgba(0,0,0,0.3); padding:15px; border-radius:12px; text-align:center; font-size:12px; border:1px dashed #00cec9; color:#00cec9; cursor:pointer;" onclick="copyReferralLink()">
+                🔗 Click to Secure Invites Node Link
             </div>
         </div>
 
-        <div class="menu-grid">
-            <div class="row-grid">
-                <button class="tab-btn" onclick="openShop(0)">🛒 Dojo Store</button>
-                <button class="tab-btn" style="background:#e056fd;" onclick="watchAdForGamepad()">📺 +1 Gamepad Token</button>
+        <div id="game-screen" class="overlay-screen">
+            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">🎮 Galactic Mini-Games</h3>
+            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Test steering coordinates through asteroids field simulations.</p>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); padding:30px 10px; border-radius:15px; text-align:center;">
+                <span style="font-size:40px;">🛸</span>
+                <h4 style="margin:10px 0 5px 0;">Asteroid Rush</h4>
+                <p style="font-size:10px; color:#a29bfe; margin-bottom:15px;">Cost: 1 Gamepad Token</p>
+                <button class="task-btn" style="background:#f1c40f;" onclick="alert('Simulation offline for background maintenance.')">Launch Mission</button>
             </div>
-            <button class="tab-btn" style="background:#2ecc71;" onclick="copyReferralLink()">🔗 Invite Friends</button>
         </div>
 
-        <div class="wallet-container">
-            <div class="wallet-title" id="withdrawal-pass-status">👛 Payout: Mapping Handshake Ledger Node...</div>
-            <select id="wallet-select" class="wallet-select" onchange="handleSelectChange()">
-                <option value="none">-- Choose Network Option --</option>
-                <option value="UPI">🇮🇳 UPI Global Terminal</option>
-                <option value="Tonkeeper">💎 TON Core Network</option>
-            </select>
-            <div id="payout-input-container" class="input-box">
-                <input type="text" id="payout-address" class="dynamic-input" placeholder="">
-            </div>
-            <button class="game-btn" id="withdraw-btn" onclick="handleWithdrawal()">💰 Execute Withdrawal</button>
-        </div>
-    </div>
-
-    <div id="shop-modal" class="overlay-screen">
-        <div class="glass-card">
-            <div class="close-icon" onclick="closeModal()">X</div>
-            <div class="card-heading" id="shop-item-type">Upgrade Matrix</div>
+        <div id="task-screen" class="overlay-screen">
+            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">📋 Verification Tasks</h3>
+            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Complete manual server validation requests to map extra currency payloads.</p>
             
-            <div class="item-icon-wrapper">
-                <div class="item-icon-image" id="shop-item-icon">⚔️</div>
-            </div>
-            
-            <div class="item-title" id="shop-item-name">Katana Sharpening</div>
-            <div class="item-desc" id="shop-item-desc">Upgrade items using coins, gamepad tokens, or cumulative video tracks.</div>
-            
-            <div class="level-stats-box">
-                <div class="stat-line" id="shop-stat-level">Level Status: 1 -> 2</div>
-                <div class="stat-line" id="shop-stat-current">Current Rate: 0.05/s</div>
-                <div class="stat-line" id="shop-stat-improved" style="color:#00cec9;">Next Rate: 0.10/s</div>
-            </div>
-
-            <div class="cost-row">
-                <button class="price-tag price-gold" onclick="executeUpgradeTransaction('coins')"><span id="coin-cost-text">0</span> 🪙</button>
-                <div class="or-divider" style="margin-bottom:0;">OR</div>
-                <button class="price-tag price-premium" onclick="executeUpgradeTransaction('premium')"><span id="premium-cost-text">0</span> 🎮</button>
-            </div>
-
-            <div id="ad-btn-container">
-                <div class="or-divider">OR</div>
-                <button class="ad-claim-strip" onclick="executeUpgradeTransaction('ad')">📺 Watch Ad (<span id="ad-progress-text">0/25</span>)</button>
-            </div>
-
-            <div class="nav-arrows-container">
-                <button class="arrow-nav-btn" onclick="navigateShop(-1)">&lt;</button>
-                <button class="arrow-nav-btn" onclick="navigateShop(1)">&gt;</button>
+            <div class="task-card">
+                <div>
+                    <div style="font-size:13px; font-weight:bold;">Watch Sponsored Video</div>
+                    <div style="font-size:11px; color:#f1c40f;">+1 Gamepad Token</div>
+                </div>
+                <button class="task-btn" onclick="watchAdForGamepad()">Execute</button>
             </div>
         </div>
+
+        <div id="calendar-screen" class="overlay-screen" style="height:100%;">
+            <div class="calendar-header">
+                <h3>📅 Daily Activity</h3>
+                <span style="cursor:pointer; font-size:20px;" onclick="toggleCalendarScreen(false)">✕</span>
+            </div>
+            <p style="font-size: 11px; color:#b2bec3; margin-bottom: 15px; text-align:center;">Visit daily and collect bonuses! Reach "Day 15" to get maximum prize.</p>
+            <div class="calendar-grid" id="calendar-grid-container"></div>
+            <div class="cooldown-strip" id="cooldown-timer-text">Come back for bonus - 00 hrs 00 min 00 sec</div>
+        </div>
+
+        <div id="payout-view" class="overlay-screen" style="justify-content:center; height:100%; background:#080911;">
+            <div class="glass-card" style="border-color:#e67e22;">
+                <h3 style="color:#e67e22; margin-bottom:15px;">👛 SECURE TRANSACTION GATEWAY</h3>
+                <select id="network-select" style="width:100%; padding:10px; background:#181926; color:white; border:1px solid #2a2b3d; border-radius:8px; font-size:12px; margin-bottom:10px;">
+                    <option value="none">-- Choose Network Option --</option>
+                    <option value="UPI">🇮🇳 UPI Global Terminal</option>
+                    <option value="TON">💎 TON Core Network</option>
+                </select>
+                <input type="text" id="destination-address" style="width:100%; padding:10px; background:#000; color:#00cec9; border:1px solid #2a2b3d; border-radius:8px; font-size:12px; margin-bottom:15px; text-align:center;" placeholder="Enter Destination Route Node">
+                <button class="nav-node-btn" style="width:100%; background:linear-gradient(180deg, #ffb300 0%, #ff8000 100%); color:white;" onclick="executeSystemWithdrawal()">💰 Execute Ledger Settlement</button>
+                <button class="nav-node-btn" style="width:100%; margin-top:8px; background:#34495e; color:white;" onclick="togglePayoutScreen(false)">Cancel</button>
+            </div>
+        </div>
+
+        <div id="shop-modal" class="overlay-screen" style="justify-content: center; background: rgba(0,0,0,0.85); height:100%; z-index:10000;">
+            <div class="glass-card">
+                <div class="close-icon" onclick="closeProductionModal()">✕</div>
+                <h3 id="shop-item-name" style="margin-bottom: 5px; font-size:18px;">Coin Mining</h3>
+                <p id="shop-item-desc" style="font-size:11px; color:#b2bec3; margin-bottom:15px;">Increase mining speed to earn more coins per second.</p>
+                
+                <div style="background:rgba(255,255,255,0.04); padding:10px; border-radius:12px; font-size:11px; margin-bottom:15px; text-align:left; line-height:1.6;">
+                    <div id="shop-stat-level">Level up: 1 -> 2</div>
+                    <div id="shop-stat-current">Your income: 0.01/sec</div>
+                    <div id="shop-stat-improved" style="color:#00cec9;">Improved income: 0.02/sec</div>
+                </div>
+
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button class="nav-node-btn" style="padding:12px; color:white; background:linear-gradient(180deg, #ffb300 0%, #ff8000 100%);" onclick="purchaseUpgrade('coins')">🪙 <span id="coin-cost-text">0</span></button>
+                    <button class="nav-node-btn" style="padding:12px; color:white; background:linear-gradient(180deg, #b800ff 0%, #7000ff 100%);" onclick="purchaseUpgrade('premium')">🔮 <span id="premium-cost-text">0</span></button>
+                </div>
+
+                <div id="ad-trigger-block" style="display:none; margin-top:10px;">
+                    <button class="ad-free-btn" onclick="purchaseUpgrade('ad')">🎬 Watch Ad Free</button>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <button class="nav-node-btn" style="max-width:60px; background: #34495e; color:white;" onclick="shiftShopItem(-1)">&lt;</button>
+                    <button class="nav-node-btn" style="max-width:60px; background: #34495e; color:white;" onclick="shiftShopItem(1)">&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-footer-nav">
+            <button id="tab-home" class="nav-node-btn active" onclick="switchTab('home')"><span>🏠</span>Home</button>
+            <button id="tab-buy" class="nav-node-btn" onclick="switchTab('buy')"><span>🚀</span>Buy</button>
+            <button id="tab-ref" class="nav-node-btn" onclick="switchTab('ref')"><span>👥</span>Referral</button>
+            <button id="tab-game" class="nav-node-btn" onclick="switchTab('game')"><span>🎮</span>Game</button>
+            <button id="tab-task" class="nav-node-btn" onclick="switchTab('task')"><span>📋</span>Task</button>
+        </div>
+
     </div>
 
     <script>
-        const WebApp = window.Telegram.WebApp;
-        WebApp.ready(); WebApp.expand();
+        const TelegramNode = window.Telegram.WebApp;
+        TelegramNode.ready(); TelegramNode.expand();
+        const userUid = TelegramNode.initDataUnsafe.user ? TelegramNode.initDataUnsafe.user.id.toString() : "6076887996";
 
-        const userTelegramName = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.first_name : "Ninja Shinobi";
-        const userTelegramID = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.id.toString() : "6076887996";
+        // Production Storage Setup
+        let balances = {
+            coins: parseFloat(localStorage.getItem(`sc_coins_${userUid}`)) || 0,
+            premium: parseInt(localStorage.getItem(`sc_premium_${userUid}`)) || 0,
+            passiveAccumulated: parseFloat(localStorage.getItem(`sc_passive_${userUid}`)) || 0
+        };
+
+        let levels = JSON.parse(localStorage.getItem(`sc_levels_${userUid}`)) || {
+            katana: 1, scroll: 1, armor: 1, container: 1, meditate: 0, fixwall: 0, smokebomb: 0
+        };
+
+        let dailyStreak = JSON.parse(localStorage.getItem(`sc_streak_${userUid}`)) || { count: 0, lastClaim: 0 };
+        let activeShopIndex = 0;
+
+        const itemsDataset = [
+            { id: "katana", name: "Coin Mining", desc: "Increase mining speed to earn more coins per second.", calc: (l) => ({ cur: (l*0.01).toFixed(2)+"/sec", nxt: ((l+1)*0.01).toFixed(2)+"/sec", coinCost: l * 1500, premCost: Math.ceil(l * 1.5), adReq: 0, isBooster: false }) },
+            { id: "scroll", name: "Coin Capacity", desc: "Increase coin storage capacity.", calc: (l) => ({ cur: (l * 50).toFixed(2), nxt: ((l+1) * 50).toFixed(2), coinCost: l * 1200, premCost: Math.ceil(l * 1.2), adReq: 0, isBooster: false }) },
+            { id: "armor", name: "Shield Strength", desc: "Improve meteor resistance parameters.", calc: (l) => ({ cur: "Withstand: "+l, nxt: "Withstand: "+(l+1), coinCost: l * 2000, premCost: Math.ceil(l * 2), adReq: 0, isBooster: false }) },
+            { id: "container", name: "Tank Volume", desc: "Increase core fuel tank metrics.", calc: (l) => ({ cur: (100+(l-1)*15) + " min", nxt: (100+l*15) + " min", coinCost: l * 1800, premCost: Math.ceil(l * 1.8), adReq: 0, isBooster: false }) },
+            { id: "meditate", name: "Refuel Ship", desc: "Full operational refuel activation.", calc: (l) => ({ cur: "Booster Pack", nxt: "Full Reset", coinCost: 500, premCost: 1, adReq: 1, isBooster: true }) },
+            { id: "fixwall", name: "Repair Shield", desc: "Structural protection node reboot.", calc: (l) => ({ cur: "Booster Pack", nxt: "Full Reset", coinCost: 600, premCost: 1, adReq: 1, isBooster: true }) },
+            { id: "smokebomb", name: "Force Field", desc: "Instant visual cloak sequence setup.", calc: (l) => ({ cur: "Booster Pack", nxt: "Activation", coinCost: 1000, premCost: 2, adReq: 1, isBooster: true }) }
+        ];
+
+        // 5-Tab Core State Management Switcher
+        function switchTab(targetTab) {
+            // Hide all sub-overlays first
+            document.getElementById('buy-screen').style.display = 'none';
+            document.getElementById('referral-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('task-screen').style.display = 'none';
+            document.getElementById('home-screen-content').style.display = 'none';
+
+            // Remove active tags from navigation frame UI
+            document.querySelectorAll('.space-footer-nav .nav-node-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (targetTab === 'home') {
+                document.getElementById('home-screen-content').style.display = 'flex';
+                document.getElementById('tab-home').classList.add('active');
+            } else if (targetTab === 'buy') {
+                document.getElementById('buy-screen').style.display = 'flex';
+                document.getElementById('tab-buy').classList.add('active');
+            } else if (targetTab === 'ref') {
+                document.getElementById('referral-screen').style.display = 'flex';
+                document.getElementById('tab-ref').classList.add('active');
+            } else if (targetTab === 'game') {
+                document.getElementById('game-screen').style.display = 'flex';
+                document.getElementById('tab-game').classList.add('active');
+            } else if (targetTab === 'task') {
+                document.getElementById('task-screen').style.display = 'flex';
+                document.getElementById('tab-task').classList.add('active');
+            }
+        }
+
+        function toggleCalendarScreen(status) { document.getElementById('calendar-screen').style.display = status ? 'flex' : 'none'; }
+        function togglePayoutScreen(status) { document.getElementById('payout-view').style.display = status ? 'flex' : 'none'; }
+
+        function compileCalendarGrid() {
+            const container = document.getElementById('calendar-grid-container');
+            container.innerHTML = "";
+            for(let i=1; i<=15; i++) {
+                const dayBox = document.createElement('div');
+                dayBox.className = "day-box";
+                let rewardType = (i % 2 === 0) ? "🔮" : "🪙";
+                let rewardVal = (rewardType === "🔮") ? Math.ceil(i/2) : i * 100;
+                
+                if(i <= dailyStreak.count) dayBox.classList.add('claimed');
+                if(i === dailyStreak.count + 1) dayBox.classList.add('current-active');
+                
+                dayBox.innerHTML = `<div class="day-title">Day ${i}</div><div class="day-reward-value">${rewardType} ${rewardVal}</div>`;
+                if(i === dailyStreak.count + 1) dayBox.onclick = () => claimDailyBonusSlot(i, rewardType, rewardVal);
+                container.appendChild(dayBox);
+            }
+        }
+
+        function claimDailyBonusSlot(day, type, val) {
+            const now = Date.now();
+            if(now - dailyStreak.lastClaim < 24*60*60*1000) { alert("24 Hours Cooldown active."); return; }
+            dailyStreak.count = day; dailyStreak.lastClaim = now;
+            localStorage.setItem(`sc_streak_${userUid}`, JSON.stringify(dailyStreak));
+            if(type === "🔮") balances.premium += val; else balances.coins += val;
+            commitDataState(); updateGlobalUI(); compileCalendarGrid();
+            alert(`🎉 Reward Claimed for Day ${day}!`);
+        }
+
+        function processCalendarClock() {
+            const timerText = document.getElementById('cooldown-timer-text');
+            const diff = Date.now() - dailyStreak.lastClaim;
+            const target = 24*60*60*1000;
+            if(diff < target) {
+                let left = target - diff;
+                let hrs = Math.floor(left / (1000*60*60));
+                let mins = Math.floor((left % (1000*60*60)) / (1000*60));
+                let secs = Math.floor((left % (1000*60)) / 1000);
+                timerText.innerText = `Come back for bonus - ${hrs} hrs ${mins} min ${secs} sec`;
+            } else { timerText.innerText = "⚡ Reward Status: Ready to Claim!"; }
+        }
+
+        function openProductionShop(idx) {
+            activeShopIndex = idx;
+            const item = itemsDataset[activeShopIndex];
+            const currentLvl = levels[item.id];
+            const meta = item.calc(currentLvl);
+
+            document.getElementById('shop-item-name').innerText = item.name;
+            document.getElementById('shop-item-desc').innerText = item.desc;
+            document.getElementById('shop-stat-level').innerText = item.isBooster ? "Consumable Pack" : `Level up: ${currentLvl} -> ${currentLvl+1}`;
+            document.getElementById('shop-stat-current').innerText = `Your Current Setting: ${meta.cur}`;
+            document.getElementById('shop-stat-improved').innerText = `Improved Setting: ${meta.nxt}`;
+            document.getElementById('coin-cost-text').innerText = Math.floor(meta.coinCost).toLocaleString();
+            document.getElementById('premium-cost-text').innerText = meta.premCost;
+            document.getElementById('ad-trigger-block').style.display = item.isBooster ? 'block' : 'none';
+            document.getElementById('shop-modal').style.display = 'flex';
+        }
+
+        function shiftShopItem(direction) {
+            activeShopIndex += direction;
+            if(activeShopIndex < 0) activeShopIndex = itemsDataset.length - 1;
+            if(activeShopIndex >= itemsDataset.length) activeShopIndex = 0;
+            openProductionShop(activeShopIndex);
+        }
+
+        function closeProductionModal() { document.getElementById('shop-modal').style.display = 'none'; }
+
+        function purchaseUpgrade(method) {
+            const item = itemsDataset[activeShopIndex];
+            const currentLvl = levels[item.id];
+            const meta = item.calc(currentLvl);
+
+            if(method === 'coins' && balances.coins >= meta.coinCost) {
+                balances.coins -= meta.coinCost; applyUpgradeLogic(item);
+            } else if(method === 'premium' && balances.premium >= meta.premCost) {
+                balances.premium -= meta.premCost; applyUpgradeLogic(item);
+            } else if(method === 'ad') {
+                masterAdEngineCascade(() => { applyUpgradeLogic(item); alert("🎉 Booster activated via Ad Validation!"); });
+            } else { alert("Insufficient assets!"); }
+        }
+
+        function applyUpgradeLogic(item) {
+            if(!item.isBooster) levels[item.id] += 1;
+            commitDataState(); updateGlobalUI(); closeProductionModal();
+        }
+
+        function triggerTapAction() { balances.coins += 1; commitDataState(); updateGlobalUI(); }
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const referrerID = urlParams.get('tgWebAppStartParam') || null;
-
-        const CONVERSION_RATE = 10000;
-        const MIN_WITHDRAW_USD = 5;
-        const MAX_SPEED_LIMIT = 55;
-
-        let coins = parseFloat(localStorage.getItem(`coins_${userTelegramID}`)) || 0;
-        let premiumTokens = parseInt(localStorage.getItem(`premium_${userTelegramID}`)) || 0;
-        let energy = parseInt(localStorage.getItem(`energy_${userTelegramID}`)) || 100;
-        let userTotalEarnedTrack = parseFloat(localStorage.getItem(`total_earned_track_${userTelegramID}`)) || 0;
-        let isReferralBonusApplied = localStorage.getItem(`ref_applied_${userTelegramID}`) === "true";
-
-        let currentShopIndex = 0;
-        let lastTapTime = 0;
-        let userIP = "";
-
-        let levels = JSON.parse(localStorage.getItem(`levels_7_matrix_${userTelegramID}`)) || {
-            katana: 1, scroll: 1, armor: 1, container: 1,
-            meditate: 0, fixwall: 0, smokebomb: 0
-        };
-
-        let adProgress = JSON.parse(localStorage.getItem(`ad_progress_map_${userTelegramID}`)) || {
-            katana: 0, scroll: 0, armor: 0, container: 0,
-            meditate: 0, fixwall: 0, smokebomb: 0
-        };
-
-        // 7 Main Options Configuration Array
-        const shopItemsConfig = [
-            { id: "katana", name: "Coin Mining", type: "Permanent Upgrade", icon: "🪙", desc: "Increase mining speed to earn more coins per second.", calc: (lvl) => ({ cur: (lvl*0.01).toFixed(2)+"/sec", nxt: ((lvl+1)*0.01).toFixed(2)+"/sec", coinCost: lvl * 6500, premCost: Math.ceil(lvl * 1.5), adRequired: 20 + (lvl * 3) }) },
-            { id: "scroll", name: "Coin Capacity", type: "Permanent Upgrade", icon: "💰", desc: "Increase coin storage to accumulate more before collecting.", calc: (lvl) => ({ cur: (lvl*50)+" Coins", nxt: ((lvl+1)*50)+" Coins", coinCost: lvl * 5500, premCost: Math.ceil(lvl * 1.2), adRequired: 20 + (lvl * 2) }) },
-            { id: "armor", name: "Shield Strength", type: "Permanent Upgrade", icon: "🛡️", desc: "Improve meteor resistance. Higher level = fewer daily damages.", calc: (lvl) => ({ cur: "Withstand: "+(lvl), nxt: "Withstand: "+(lvl+1), coinCost: lvl * 7000, premCost: Math.ceil(lvl * 2), adRequired: 25 + (lvl * 4) }) },
-            { id: "container", name: "Tank Volume", type: "Permanent Upgrade", icon: "🛢️", desc: "Increase fuel tank for longer flights without refueling.", calc: (lvl) => ({ cur: (100+(lvl-1)*15)+" min", nxt: (100+lvl*15)+" min", coinCost: lvl * 4500, premCost: Math.ceil(lvl * 1), adRequired: 15 + (lvl * 2) }) },
-            { id: "meditate", name: "Refuel Ship", type: "Consumable Booster", icon: "⛽", desc: "Fill fuel tank completely to continue mining.", calc: (lvl) => ({ cur: lvl+" Stock", nxt: (lvl+1)+" Stock", coinCost: 1200, premCost: 1, adRequired: 1 }) },
-            { id: "fixwall", name: "Repair Shield", type: "Consumable Booster", icon: "🔧", desc: "Fix ship shield to continue coin mining.", calc: (lvl) => ({ cur: lvl+" Stock", nxt: (lvl+1)+" Stock", coinCost: 1500, premCost: 1, adRequired: 1 }) },
-            { id: "smokebomb", name: "Force Field", type: "Consumable Booster", icon: "🌀", desc: "Get meteor immunity for 5-25 minutes (shield takes no damage).", calc: (lvl) => ({ cur: lvl+" Stock", nxt: (lvl+1)+" Stock", coinCost: 4000, premCost: 3, adRequired: 2 }) }
-        ];
-
-        const ninjaRanksConfig = [
-            { level: 1, title: "Academy Student", minCoins: 0 },
-            { level: 2, title: "Genin", minCoins: 10000 },
-            { level: 3, title: "Chunin", minCoins: 50000 },
-            { level: 4, title: "Jounin", minCoins: 2500000 },
-            { level: 5, title: "Special Jounin", minCoins: 10000000 },
-            { level: 6, title: "Anbu Black Ops", minCoins: 50000000 },
-            { level: 7, title: "Dojo Master", minCoins: 100000000 },
-            { level: 8, title: "Legendary Sannin", minCoins: 500000000 },
-            { level: 9, title: "Shadow Kage", minCoins: 1000000000 },
-            { level: 10, title: "Grandmaster Shinobi", minCoins: 5000000000 }
-        ];
-
-        function getPlayerProfileLevelData() {
-            let activeRank = ninjaRanksConfig[0];
-            for (let i = ninjaRanksConfig.length - 1; i >= 0; i--) {
-                if (userTotalEarnedTrack >= ninjaRanksConfig[i].minCoins) {
-                    activeRank = ninjaRanksConfig[i];
-                    break;
-                }
-            }
-            return activeRank;
+        function collectPassiveHoldings() {
+            if(balances.passiveAccumulated <= 0) return;
+            balances.coins += balances.passiveAccumulated; balances.passiveAccumulated = 0;
+            commitDataState(); updateGlobalUI();
         }
 
-        function getWithdrawalLimit(level) {
-            if (level === 10) return "UNLIMITED";
-            if (level >= 7 && level <= 9) return 10;
-            if (level === 6) return 5;
-            if (level === 5) return 3;
-            if (level === 3 || level === 4) return 2;
-            return 0;
+        function copyReferralLink() {
+            let refLink = `https://t.me/your_bot_username?start=${userUid}`;
+            navigator.clipboard.writeText(refLink);
+            alert("🔗 System link copied to dashboard clipboard structure!");
         }
 
-        function triggerAntiCheatSystem() {
-            let strikes = parseInt(localStorage.getItem(`cheater_strike_${userTelegramID}`)) || 0;
-            if (strikes === 0) {
-                localStorage.setItem(`cheater_strike_${userTelegramID}`, "1");
-                document.getElementById('warning-screen').style.display = "flex";
-            } else {
-                document.body.innerHTML = "<div style='text-align:center;color:#ff4757;padding:50px;font-family:Orbitron,sans-serif;margin-top:40vh;'><h2>ACCESS TERMINATED</h2></div>";
-            }
+        function commitDataState() {
+            localStorage.setItem(`sc_coins_${userUid}`, balances.coins);
+            localStorage.setItem(`sc_premium_${userUid}`, balances.premium);
+            localStorage.setItem(`sc_passive_${userUid}`, balances.passiveAccumulated);
+            localStorage.setItem(`sc_levels_${userUid}`, JSON.stringify(levels));
         }
 
-        function dismissWarning() { document.getElementById('warning-screen').style.display = "none"; }
-
-        function handleTap(event) {
-            const currentTime = Date.now();
-            if (lastTapTime !== 0 && (currentTime - lastTapTime < MAX_SPEED_LIMIT)) {
-                triggerAntiCheatSystem(); return;
-            }
-            lastTapTime = currentTime;
-
-            if (energy >= 2) {
-                coins += 2;
-                energy -= 2;
-                userTotalEarnedTrack += 2;
-                
-                localStorage.setItem(`coins_${userTelegramID}`, coins);
-                localStorage.setItem(`total_earned_track_${userTelegramID}`, userTotalEarnedTrack);
-                
-                checkReferralUnlockCondition();
-                updateUI();
-            } else {
-                alert("Out of energy! Purchase a Refuel Pack.");
-            }
-        }
-
-        function checkReferralUnlockCondition() {
-            if (referrerID && !isReferralBonusApplied && userTotalEarnedTrack >= 1500) {
-                isReferralBonusApplied = true;
-                localStorage.setItem(`ref_applied_${userTelegramID}`, "true");
-                coins += 2000;
-                localStorage.setItem(`coins_${userTelegramID}`, coins);
-                alert("🎉 Referral Verified! +2,000 Pts credited.");
-            }
-        }
-
-        function openShop(index) {
-            currentShopIndex = index;
-            const item = shopItemsConfig[currentShopIndex];
-            const currentLvl = levels[item.id];
-            const meta = item.calc(currentLvl);
-
-            document.getElementById("shop-item-type").innerText = item.type;
-            document.getElementById("shop-item-icon").innerText = item.icon;
-            document.getElementById("shop-item-name").innerText = item.name;
-            document.getElementById("shop-item-desc").innerText = item.desc;
+        function updateGlobalUI() {
+            document.getElementById('coin-display').innerText = balances.coins.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('premium-display').innerText = balances.premium;
             
-            document.getElementById("shop-stat-level").innerText = `Level up: ${currentLvl} -> ${currentLvl + 1}`;
-            document.getElementById("shop-stat-current").innerText = `Your income: ${meta.cur}`;
-            document.getElementById("shop-stat-improved").innerText = `Improved income: ${meta.nxt}`;
-            
-            document.getElementById("coin-cost-text").innerText = Math.floor(meta.coinCost).toLocaleString();
-            document.getElementById("premium-cost-text").innerText = meta.premCost;
+            const currentMaxCapacity = levels.scroll * 50;
+            document.getElementById('capacity-ui').innerText = (balances.passiveAccumulated).toFixed(2) + " / " + currentMaxCapacity.toFixed(2);
 
-            const currentAdStreak = adProgress[item.id];
-            document.getElementById("ad-progress-text").innerText = `${currentAdStreak}/${meta.adRequired}`;
+            let fuelPercent = (levels.container * 10) % 100; if(fuelPercent === 0) fuelPercent = 100;
+            document.getElementById('fuel-bar').style.height = fuelPercent + "%";
+            document.getElementById('fuel-txt').innerText = Math.floor(fuelPercent) + "s";
 
-            document.getElementById("shop-modal").style.display = "flex";
+            let shieldPercent = (levels.armor * 15) % 100; if(shieldPercent === 0) shieldPercent = 100;
+            document.getElementById('shield-bar').style.height = shieldPercent + "%";
+            document.getElementById('shield-txt').innerText = Math.floor(shieldPercent) + "%";
         }
 
-        function navigateShop(dir) {
-            currentShopIndex += dir;
-            if (currentShopIndex < 0) currentShopIndex = shopItemsConfig.length - 1;
-            if (currentShopIndex >= shopItemsConfig.length) currentShopIndex = 0;
-            openShop(currentShopIndex);
-        }
-
-        function closeModal() { document.getElementById("shop-modal").style.display = "none"; }
-
-        function executeUpgradeTransaction(method) {
-            const item = shopItemsConfig[currentShopIndex];
-            const currentLvl = levels[item.id];
-            const meta = item.calc(currentLvl);
-
-            if (method === 'coins' && coins >= meta.coinCost) { 
-                coins -= meta.coinCost; 
-                executeUpgradeRewardLogic(item.id);
-            } 
-            else if (method === 'premium' && premiumTokens >= meta.premCost) { 
-                premiumTokens -= meta.premCost; 
-                executeUpgradeRewardLogic(item.id);
-            } 
-            else if (method === 'ad') {
-                masterAdEngineCascade(() => { 
-                    adProgress[item.id] += 1;
-                    localStorage.setItem(`ad_progress_map_${userTelegramID}`, JSON.stringify(adProgress));
-                    
-                    if (adProgress[item.id] >= meta.adRequired) {
-                        adProgress[item.id] = 0; 
-                        localStorage.setItem(`ad_progress_map_${userTelegramID}`, JSON.stringify(adProgress));
-                        executeUpgradeRewardLogic(item.id);
-                        alert("🎉 Target Ad Sequence Complete! Level Up Granted Free.");
-                    } else {
-                        alert(`📺 Ad Registered! (${adProgress[item.id]}/${meta.adRequired}) watched.`);
-                        openShop(currentShopIndex);
-                    }
-                });
-            } else {
-                alert("Insufficient assets resource tokens!");
-            }
-        }
-
-        function executeUpgradeRewardLogic(itemId) {
-            if (itemId === "meditate") {
-                const maxEnergy = 100 + (levels.container - 1) * 15;
-                energy = maxEnergy;
-            } else {
-                levels[itemId] += 1;
-                localStorage.setItem(`levels_7_matrix_${userTelegramID}`, JSON.stringify(levels));
-            }
-            localStorage.setItem(`coins_${userTelegramID}`, coins);
-            localStorage.setItem(`premium_${userTelegramID}`, premiumTokens);
-            localStorage.setItem(`energy_${userTelegramID}`, energy);
-            
-            updateUI();
-            openShop(currentShopIndex);
-        }
-
-        function watchAdForGamepad() {
-            masterAdEngineCascade(() => {
-                premiumTokens += 1;
-                localStorage.setItem(`premium_${userTelegramID}`, premiumTokens);
-                updateUI();
-                alert("🎉 Video Ad verified! +1 Gamepad Token.");
-            });
-        }
-
-        // --- 4-LAYER INTEGRATED CASCADE ENGINE (UPDATED WITH YOUR REWARDED INJECTORS) ---
+        // ADS MODULES
         const AdsgramController = window.Adsgram ? window.Adsgram.init({ blockId: "int-34137" }) : null;
 
         function masterAdEngineCascade(onSuccessCallback) {
-            // Layer 1: Adsgram Native Buffer
             if (AdsgramController) {
                 AdsgramController.show().then(() => { onSuccessCallback(); }).catch(() => { runMonetagRewardedInterstitial(onSuccessCallback); });
             } else { runMonetagRewardedInterstitial(onSuccessCallback); }
         }
 
         function runMonetagRewardedInterstitial(onSuccessCallback) {
-            // Layer 2: Monetag Rewarded Interstitial format mapping
-            if (typeof show_11090557 === 'function') {
-                show_11090557().then(() => {
-                    onSuccessCallback();
-                }).catch((e) => { 
-                    runMonetagRewardedPopup(onSuccessCallback); 
-                });
-            } else { runMonetagRewardedPopup(onSuccessCallback); }
+            if (typeof show_11090557 === 'function') { show_11090557().then(() => { onSuccessCallback(); }).catch(() => { runMonetagRewardedPopup(onSuccessCallback); }); }
+            else { runMonetagRewardedPopup(onSuccessCallback); }
         }
 
         function runMonetagRewardedPopup(onSuccessCallback) {
-            // Layer 3: Monetag Rewarded Popup fallback hook execution
-            if (typeof show_11090557 === 'function') {
-                show_11090557('pop').then(() => {
-                    onSuccessCallback();
-                }).catch((e) => {
-                    runTaddyFallback(onSuccessCallback);
-                });
-            } else { runTaddyFallback(onSuccessCallback); }
+            if (typeof show_11090557 === 'function') { show_11090557('pop').then(() => { onSuccessCallback(); }).catch(() => { runTaddyFallback(onSuccessCallback); }); }
+            else { runTaddyFallback(onSuccessCallback); }
         }
 
         function runTaddyFallback(onSuccessCallback) {
-            // Layer 4: Taddy Exchange Core fallback node
             if (window.Taddy) {
-                try {
-                    window.Taddy.ads().showInterstitial().then(() => { onSuccessCallback(); }).catch(() => { alert("Fallback ad pipeline latency timed out."); });
-                } catch(e) { alert("Ad initialization fallback terminal exception."); }
-            } else { alert("Ad core interface blocks detected offline."); }
+                try { window.Taddy.ads().showInterstitial().then(() => { onSuccessCallback(); }).catch(() => { alert("Ad execution error."); }); }
+                catch(e) { alert("Ad node failure."); }
+            } else { alert("Ad initialization missing."); }
         }
 
-        function handleWithdrawal() {
-            const selectedMethod = document.getElementById('wallet-select').value;
-            const addressValue = document.getElementById('payout-address').value.trim();
-            const currentUSD = coins / CONVERSION_RATE;
-
-            const profileData = getPlayerProfileLevelData();
-            const maxAllowedWithdrawals = getWithdrawalLimit(profileData.level);
-            
-            let pastWithdrawalCounter = parseInt(localStorage.getItem(`withdrawal_count_log_${userTelegramID}`)) || 0;
-            let lastWithdrawTimestamp = parseInt(localStorage.getItem(`last_withdrawal_timestamp_${userTelegramID}`)) || 0;
-            
-            const currentTime = Date.now();
-            const twentyFourHours = 24 * 60 * 60 * 1000;
-
-            if (maxAllowedWithdrawals === 0) {
-                alert(`🔒 Locked! Reach Level 3 (Chunin Rank) to execute a withdrawal.`);
-                return;
-            }
-            if (lastWithdrawTimestamp !== 0 && (currentTime - lastWithdrawTimestamp < twentyFourHours)) {
-                alert(`⏳ Daily limit: 1 payout per day rule active. Please standby.`);
-                return;
-            }
-            if (maxAllowedWithdrawals !== "UNLIMITED" && pastWithdrawalCounter >= maxAllowedWithdrawals) {
-                alert(`⚠️ Level limit reached! Reach level 10 for absolute unlimited modes.`);
-                return;
-            }
-
-            if (selectedMethod === "none" || addressValue === "") { alert("Fill address details properly!"); return; }
-            if (currentUSD < MIN_WITHDRAW_USD) { alert(`Minimum payout limit is $${MIN_WITHDRAW_USD}.`); return; }
-
-            const wBtn = document.getElementById('withdraw-btn');
-            wBtn.innerText = "Deploying Ledger Transaction..."; wBtn.disabled = true;
-
-            setTimeout(() => {
-                pastWithdrawalCounter += 1;
-                localStorage.setItem(`withdrawal_count_log_${userTelegramID}`, pastWithdrawalCounter);
-                localStorage.setItem(`last_withdrawal_timestamp_${userTelegramID}`, currentTime.toString());
-                
-                alert("🎉 Transaction Requested successfully via Daily Ledger Channel.");
-                coins = 0; localStorage.setItem(`coins_${userTelegramID}`, coins);
-                updateUI();
-                wBtn.innerText = "💰 Execute Withdrawal"; wBtn.disabled = false;
-            }, 2000);
+        function watchAdForGamepad() {
+            masterAdEngineCascade(() => { balances.premium += 1; commitDataState(); updateGlobalUI(); alert("Token Granted successfully!"); });
         }
 
-        function copyReferralLink() {
-            const link = `https://t.me/Ninjatapgamebot/start?startapp=${userTelegramID}`;
-            navigator.clipboard.writeText(link).then(() => { alert("Referral link copied!"); });
+        function executeSystemWithdrawal() {
+            const targetSelect = document.getElementById('network-select').value;
+            const addressValue = document.getElementById('destination-address').value.trim();
+            if(targetSelect === 'none' || addressValue === '') { alert("Invalid credentials entered."); return; }
+            alert("🔒 Settlement Processing Initialized!");
+            balances.coins = 0; commitDataState(); updateGlobalUI(); togglePayoutScreen(false);
         }
 
-        function handleSelectChange() {
-            const opt = document.getElementById('wallet-select').value;
-            const container = document.getElementById('payout-input-container');
-            const field = document.getElementById('payout-address');
-            if (opt === 'none') { container.style.display = 'none'; } 
-            else {
-                container.style.display = 'block';
-                field.placeholder = opt === 'UPI' ? "Enter valid UPI ID" : "Enter TON Wallet Address";
-            }
-        }
-
-        function updateUI() {
-            document.getElementById('coin-count').innerText = Math.floor(coins).toLocaleString();
-            document.getElementById('premium-count').innerText = premiumTokens;
-            
-            const profileData = getPlayerProfileLevelData();
-            document.getElementById('profile-rank-badge').innerText = `${profileData.title} (Lvl ${profileData.level})`;
-
-            const maxAllowed = getWithdrawalLimit(profileData.level);
-            let counterLog = parseInt(localStorage.getItem(`withdrawal_count_log_${userTelegramID}`)) || 0;
-            
-            const passStatusText = document.getElementById('withdrawal-pass-status');
-            if (maxAllowed === 0) {
-                passStatusText.innerText = `👛 Payout Lock: Level ${profileData.level}`;
-            } else if (maxAllowed === "UNLIMITED") {
-                passStatusText.innerText = `👛 Lvl 10 Unlimited Mode [1 Payout / Day]`;
-            } else {
-                passStatusText.innerText = `👛 Limit Left: (${maxAllowed - counterLog}/${maxAllowed})`;
-            }
-
-            const maxEnergy = 100 + (levels.container - 1) * 15;
-            document.getElementById('energy-count').innerText = energy;
-            document.getElementById('max-energy-ui').innerText = maxEnergy;
-            document.getElementById('energy-bar').style.width = (energy / maxEnergy * 100) + "%";
-
-            document.getElementById('mining-speed-header').innerText = (levels.katana * 0.01).toFixed(2) + "/sec";
-            document.getElementById('storage-header').innerText = (levels.scroll * 50);
-        }
-
-        // Auto Coin Generation Passive Miner Track
+        // Engine Interval Passive Loops
         setInterval(() => {
-            const passiveRate = levels.katana * 0.01;
-            const maxStorage = levels.scroll * 50;
-            if (coins < maxStorage) {
-                coins += passiveRate;
-                userTotalEarnedTrack += passiveRate;
-                localStorage.setItem(`coins_${userTelegramID}`, coins);
-                localStorage.setItem(`total_earned_track_${userTelegramID}`, userTotalEarnedTrack);
-                document.getElementById('coin-count').innerText = Math.floor(coins).toLocaleString();
+            const speed = levels.katana * 0.01;
+            const limit = levels.scroll * 50;
+            if(balances.passiveAccumulated < limit) {
+                balances.passiveAccumulated = Math.min(limit, balances.passiveAccumulated + speed);
+                localStorage.setItem(`sc_passive_${userUid}`, balances.passiveAccumulated);
+                updateGlobalUI();
             }
         }, 1000);
 
-        // Constant 30 Seconds Energy Engine Loop Trigger
-        setInterval(() => {
-            const maxEnergy = 100 + (levels.container - 1) * 15;
-            if (energy < maxEnergy) {
-                energy += 1;
-                localStorage.setItem(`energy_${userTelegramID}`, energy);
-                updateUI();
-            }
-        }, 30000); 
+        setInterval(processCalendarClock, 1000);
 
-        window.onload = async () => {
-            updateUI();
-            try {
-                let ipRes = await fetch('https://api.ipify.org?format=json');
-                let ipData = await ipRes.json(); userIP = ipData.ip;
-            } catch(e){}
-
-            // 5. AUTOMATIC MONETAG IN-APP INTERSTITIAL REGULATION (INTEGRATED AS PROVIDED)
+        window.onload = () => {
+            updateGlobalUI(); compileCalendarGrid();
             if (typeof show_11090557 === 'function') {
-                show_11090557({
-                    type: 'inApp',
-                    inAppSettings: {
-                        frequency: 2,
-                        capping: 0.1,
-                        interval: 30,
-                        timeout: 5,
-                        everyPage: false
-                    }
-                });
+                show_11090557({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
             }
-
-            if (window.Taddy) {
-                window.Taddy.init('4e95d659cb46669dbe7d1ac3cf15bb86');
-                window.Taddy.ready();
-            }
+            if (window.Taddy) { window.Taddy.init('4e95d659cb46669dbe7d1ac3cf15bb86'); window.Taddy.ready(); }
         };
     </script>
 </body>
 </html>
-   
-          
+
+
+ 
 
         
             
