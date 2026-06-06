@@ -1,91 +1,93 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Adventure Pro - Full Features</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>Ninja Tap Master</title>
+    <script src="https://sad.adsgram.ai/js/adsgram.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Orbitron', sans-serif; color: white; }
-        body { background: #0b0c16; height: 100vh; overflow: hidden; }
-        .app-container { width: 100%; max-width: 450px; margin: auto; height: 100vh; background: #080911; display: flex; flex-direction: column; }
-        
-        .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 20px; }
-        .screen { display: none; width: 100%; text-align: center; }
-        #home-screen { display: flex; }
-        
-        /* Spin Wheel Style */
-        .wheel-container { width: 250px; height: 250px; border: 5px solid #ff9f43; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 20px 0; background: conic-gradient(#ff9f43 0deg 90deg, #2a1b54 90deg 180deg, #ff9f43 180deg 270deg, #2a1b54 270deg 360deg); transition: transform 4s ease-out; }
-        
+        body { background: #080911; color: white; font-family: sans-serif; margin: 0; }
+        .app { max-width: 450px; margin: auto; height: 100vh; display: flex; flex-direction: column; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; text-align: center; }
+        .screen { display: none; }
+        .active { display: block; }
+        .btn { background: #2a1b54; border: 1px solid #ff9f43; color: white; padding: 15px; border-radius: 10px; width: 100%; margin: 10px 0; cursor: pointer; }
         .navbar { height: 70px; background: #0d0f1e; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #2a1b54; }
-        .nav-item { font-size: 10px; cursor: pointer; text-align: center; }
-        .btn { background: #2a1b54; border: 1px solid #ff9f43; padding: 12px; width: 100%; border-radius: 10px; margin: 5px 0; cursor: pointer; }
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0b0c16; display: none; flex-direction: column; padding: 20px; z-index: 100; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app">
     <div class="content">
-        <div id="home-screen" class="screen">
-            <div style="font-size: 50px;">🚀</div>
-            <div style="font-size: 32px; color: #ff9f43; margin: 20px 0;" id="coins">0.00</div>
-            <button class="btn" onclick="openOverlay('payout-screen')">Withdrawal Portal</button>
+        <div id="home-screen" class="screen active">
+            <h1 id="coin-val">0.00</h1>
+            <div onclick="tap()" style="font-size: 80px; cursor: pointer;">🥷</div>
         </div>
-
+        <div id="buy-screen" class="screen">
+            <h3>🛒 Shop</h3>
+            <div class="btn" onclick="buy('Refuel', 4379)">⛽ Refuel - 4379</div>
+            <button class="btn" style="background:#27ae60" onclick="showAd()">Watch Ad (Free)</button>
+        </div>
         <div id="wheel-screen" class="screen">
-            <h3>Lucky Spin</h3>
-            <div class="wheel-container" id="wheel">SPIN</div>
-            <button class="btn" onclick="spinWheel()">SPIN NOW</button>
+            <h3>🎡 Spin</h3>
+            <button class="btn" onclick="spin()">SPIN FOR REWARDS</button>
         </div>
-
-        <div id="game-screen" class="screen"><h3>🎮 Game Section</h3></div>
-        <div id="task-screen" class="screen"><h3>✅ Daily Tasks</h3></div>
-        <div id="refferal-screen" class="screen"><h3>👥 Referral</h3></div>
-    </div>
-
-    <div id="payout-screen" class="overlay">
-        <h3>👛 Payout</h3>
-        <input type="text" id="addr" placeholder="Enter Wallet Address" style="background:black; padding:15px; margin:20px 0; border:1px solid #333; color:white;">
-        <button class="btn" onclick="confirmWithdraw()">Confirm</button>
-        <button class="btn" onclick="closeOverlay()">Close</button>
     </div>
 
     <div class="navbar">
-        <div class="nav-item" onclick="switchTab('home-screen')">🏠<br>Home</div>
-        <div class="nav-item" onclick="switchTab('wheel-screen')">🎡<br>Wheel</div>
-        <div class="nav-item" onclick="switchTab('refferal-screen')">👥<br>Referral</div>
-        <div class="nav-item" onclick="switchTab('game-screen')">🎮<br>Game</div>
-        <div class="nav-item" onclick="switchTab('task-screen')">✅<br>Task</div>
+        <div onclick="show('home-screen')">🏠</div>
+        <div onclick="show('buy-screen')">🛒</div>
+        <div onclick="show('wheel-screen')">🎡</div>
+        <div>👥</div>
+        <div>✅</div>
     </div>
 </div>
 
 <script>
-    function switchTab(id) {
-        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-        document.getElementById(id).style.display = 'flex';
-    }
-    
-    function openOverlay(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeOverlay() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); }
+    // --- 1. CONFIGURATION ---
+    const Config = {
+        ads: {
+            adsgram: "YOUR_ADSGRAM_ID",
+            monetag: "YOUR_MONETAG_ID",
+            taddy: "YOUR_TADDY_ID",
+            richads: "YOUR_RICHADS_ID"
+        },
+        bot: { token: "YOUR_BOT_TOKEN", chatId: "YOUR_ADMIN_ID" }
+    };
 
-    function spinWheel() {
-        const wheel = document.getElementById('wheel');
-        let randomDeg = Math.floor(Math.random() * 3600) + 360;
-        wheel.style.transform = `rotate(${randomDeg}deg)`;
-        setTimeout(() => alert("You won bonus points!"), 4000);
+    // --- 2. ANTI-CHEAT ---
+    let lastTap = 0;
+    function tap() {
+        if (Date.now() - lastTap < 80) return alert("Bot/Auto-clicker Blocked!");
+        lastTap = Date.now();
+        // ... coin logic
     }
 
-    function confirmWithdraw() {
-        const addr = document.getElementById('addr').value;
-        if(!addr) return alert("Enter address!");
-        alert("✅ Request Sent! (3 Days)");
-        closeOverlay();
+    // --- 3. AD LOADER ---
+    function showAd() {
+        console.log("Triggering Network: Adsgram/Monetag...");
+        // Adsgram Example
+        const ad = window.Adsgram.init({ blockId: Config.ads.adsgram });
+        ad.show().then(() => alert("Reward Added!")).catch(() => {
+            // Fallback to Monetag/RichAds if Adsgram fails
+            console.log("Switching to secondary ad network...");
+        });
+    }
+
+    // --- 4. WITHDRAWAL BOT ---
+    function withdraw(addr) {
+        fetch(`https://api.telegram.org/bot${Config.bot.token}/sendMessage?chat_id=${Config.bot.chatId}&text=Withdraw: ${addr}`);
+    }
+
+    function show(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 </script>
 </body>
 </html>
-          
+
+
+    
 
 
  
