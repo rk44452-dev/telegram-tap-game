@@ -4,486 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Adventure - Premium Terminal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght=500;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <script src='//libtl.com/sdk.js' data-zone='11090557' data-sdk='show_11090557'></script>
-    <script src="https://sdk.taddy.pro/web/taddy.min.js" data-pub-id="4e95d659cb46669dbe7d1ac3cf15bb86"></script>
-    <script src="https://richinfo.co/richpartners/in-page/js/richads-ob.js?pubid=1013762&siteid=398682" async></script>
-    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Orbitron', sans-serif; user-select: none; }
-        body { background: #0b0c16; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        body { background: #0b0c16; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 420px; height: 100vh; background: radial-gradient(circle at center, #1b133a 0%, #080911 100%); border: 2px solid #2a1b54; position: relative; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
         
-        .app-container { width: 100%; max-width: 420px; height: 100vh; background: radial-gradient(circle at center, #1b133a 0%, #080911 100%); border: 2px solid #2a1b54; position: relative; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto; }
+        .overlay-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0b0c16; z-index: 999; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .overlay-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .close-cross { cursor: pointer; font-size: 24px; color: #ff7675; }
         
-        /* Premium Space Top Bar */
-        .space-header { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; margin-top: 5px; }
-        .token-row { display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 14px; color: #e056fd; font-weight: bold; }
-        .buy-badge { background: #e056fd; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; cursor: pointer; }
-        .main-coin-display { font-size: 34px; color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.4); font-weight: 800; display: flex; align-items: center; gap: 5px; }
-        .withdraw-badge { background: transparent; border: 1px solid #f1c40f; color: #f1c40f; font-size: 10px; padding: 2px 6px; border-radius: 5px; margin-left: 5px; cursor: pointer; }
+        .history-item { background: #181926; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #f1c40f; }
+        .history-text { font-size: 11px; color: #b2bec3; margin-bottom: 3px; }
+        .btn-main { background: linear-gradient(180deg, #ffb300, #ff8000); color: white; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
         
-        /* Storage Capacity Strip */
-        .capacity-strip { background: linear-gradient(90deg, #f1c40f, #f39c12); color: #000; width: 50%; padding: 4px; border-radius: 20px; text-align: center; font-size: 12px; font-weight: bold; margin: 5px auto; box-shadow: 0 0 10px rgba(241,196,15,0.3); }
-
-        /* Central Rocket Stage */
-        .rocket-stage { display: flex; justify-content: space-around; align-items: center; width: 100%; margin: 15px 0; position: relative; }
-        .vertical-gauge { width: 30px; height: 110px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 2px; }
-        .gauge-fill { width: 100%; border-radius: 6px; transition: height 0.3s ease; }
-        .gauge-label { position: absolute; top: -18px; width: 100%; text-align: center; font-size: 9px; color: #a29bfe; }
-        .gauge-icon { text-align: center; font-size: 14px; margin-top: 5px; }
-        
-        .rocket-pod { width: 140px; height: 140px; display: flex; justify-content: center; align-items: center; position: relative; }
-        .rocket-art { font-size: 85px; filter: drop-shadow(0 0 20px rgba(155, 89, 182, 0.5)); animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-        .collect-btn { background: linear-gradient(135deg, #f39c12, #e67e22); border: none; padding: 10px 35px; border-radius: 15px; color: white; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(230,126,34,0.4); margin-top: 5px; }
-        .collect-btn:active { transform: scale(0.95); }
-
-        /* Icon Grid Side Panels */
-        .side-utilities { display: flex; justify-content: flex-end; gap: 15px; width: 100%; padding-right: 15px; margin-bottom: 10px; }
-        .util-icon-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
-        .util-circle { width: 42px; height: 42px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; }
-
-        /* EXACT SPACE ADVENTURE 5-BUTTON FOOTER NAV */
-        .space-footer-nav { display: flex; justify-content: space-between; width: 100%; gap: 4px; background: rgba(13, 15, 30, 0.9); padding: 8px 4px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
-        .nav-node-btn { flex: 1; padding: 10px 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; color: #b2bec3; font-size: 9px; font-weight: bold; text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.2s; }
-        .nav-node-btn span { font-size: 16px; }
-        .nav-node-btn.active { background: linear-gradient(180deg, #ffb300 0%, #ff8000 100%); color: white; border: none; box-shadow: 0 0 10px rgba(255, 128, 0, 0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-
-        /* Overlay Screens Setup */
-        .overlay-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 65px); background: rgba(11, 12, 22, 0.98); z-index: 999; flex-direction: column; padding: 15px; overflow-y: auto; }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-bottom: 20px; }
-        
-        .day-box { background: #181926; border: 1px solid #2a2b3d; border-radius: 12px; padding: 12px 8px; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .day-box.claimed { border-color: #2ecc71; background: rgba(46, 204, 113, 0.05); }
-        .day-box.claimed::after { content: "✓"; position: absolute; top: 4px; right: 8px; color: #2ecc71; font-weight: bold; font-size: 12px; }
-        .day-box.current-active { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241,196,15,0.2); }
-        
-        .day-title { font-size: 10px; color: #b2bec3; }
-        .day-reward-value { font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 3px; }
-
-        .cooldown-strip { font-size: 11px; color: #ff7675; text-align: center; margin-top: auto; padding: 10px; background: rgba(255,118,117,0.05); border-radius: 10px; width: 100%; }
-        
-        /* Custom Shop UI Overlay */
-        .glass-card { width: 100%; background: #131a26; border: 3px solid #00cec9; border-radius: 24px; padding: 20px; text-align: center; position: relative; box-shadow: 0 0 25px rgba(0, 206, 201, 0.2); margin: auto 0; }
-        .close-icon { position: absolute; top: 12px; right: 15px; font-size: 20px; color: #fff; cursor: pointer; font-weight: bold; }
-        .ad-free-btn { background: #ffffff; color: #202124; padding: 8px 20px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; margin-top: 12px; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; }
-
-        /* Task Item Design */
-        .task-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .task-btn { background: #00cec9; color: black; border: none; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .home-ui { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .space-footer-nav { display: flex; justify-content: space-between; width: 100%; background: #0d0f1e; padding: 10px; border-radius: 15px; }
+        .nav-btn { color: #b2bec3; font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        
-        <div id="home-screen-content" style="display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; margin-bottom: 10px;">
-            <div class="space-header">
-                <div style="font-size: 11px; color: #a29bfe; font-weight: bold;">Space Command Center</div>
-                <div class="token-row">
-                    <span>🔮 <span id="premium-display">0</span></span>
-                    <span class="buy-badge" onclick="switchTab('buy')">Buy +</span>
-                </div>
-                <div class="main-coin-display">
-                    🪙 <span id="coin-display">0.00</span>
-                    <span class="withdraw-badge" onclick="togglePayoutScreen(true)">Withdrawal ⌂</span>
-                </div>
-                <div class="capacity-strip" id="capacity-ui">0.00 / 0.00</div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-                <div class="rocket-stage">
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="vertical-gauge">
-                            <div class="gauge-fill" id="fuel-bar" style="height: 0%; background: linear-gradient(#f1c40f, #e67e22);"></div>
-                            <div class="gauge-label" id="fuel-txt">0s</div>
-                        </div>
-                        <div class="gauge-icon">⛽</div>
-                    </div>
-
-                    <div class="rocket-pod" onclick="triggerTapAction()">
-                        <div class="rocket-art">🚀</div>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="vertical-gauge">
-                            <div class="gauge-fill" id="shield-bar" style="height: 0%; background: linear-gradient(#3498db, #2980b9);"></div>
-                            <div class="gauge-label" id="shield-txt">0%</div>
-                        </div>
-                        <div class="gauge-icon">🛡️</div>
-                    </div>
-                </div>
-
-                <button class="collect-btn" onclick="collectPassiveHoldings()">Collect</button>
-            </div>
-
-            <div class="side-utilities">
-                <div class="util-icon-btn">
-                    <div class="util-circle">🎁</div>
-                    <span style="font-size: 8px;">Giveaways</span>
-                </div>
-                <div class="util-icon-btn" onclick="toggleCalendarScreen(true)">
-                    <div class="util-circle">📅</div>
-                    <span style="font-size: 8px;">Daily</span>
-                </div>
-                <div class="util-icon-btn">
-                    <div class="util-circle">🎡</div>
-                    <span style="font-size: 8px;">Spin</span>
-                </div>
-            </div>
+        <div id="home-screen" class="home-ui">
+            <div style="font-size: 50px; margin-bottom: 20px;">🚀</div>
+            <h2 id="coin-display">0.00</h2>
+            <button class="btn-main" onclick="togglePayoutScreen(true)" style="margin-top:20px;">Withdrawal Portal</button>
         </div>
 
-        <div id="buy-screen" class="overlay-screen">
-            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">🚀 Upgrades & Boosters</h3>
-            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Upgrade your galactic tech nodes to maximize automatic generation streams.</p>
-            <button class="collect-btn" style="width:100%; margin-bottom:10px;" onclick="openProductionShop(0)">Open Shop Matrix</button>
-        </div>
-
-        <div id="referral-screen" class="overlay-screen">
-            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">👥 Invite Alliances</h3>
-            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Bring alternative commanders into the network logs to secure a 10% premium bonus split.</p>
-            <div style="background: rgba(0,0,0,0.3); padding:15px; border-radius:12px; text-align:center; font-size:12px; border:1px dashed #00cec9; color:#00cec9; cursor:pointer;" onclick="copyReferralLink()">
-                🔗 Click to Secure Invites Node Link
+        <div id="payout-view" class="overlay-screen">
+            <div class="overlay-header">
+                <h3>👛 Withdrawal Gateway</h3>
+                <span class="close-cross" onclick="togglePayoutScreen(false)">✕</span>
             </div>
+            <label style="font-size:10px; color:#888;">Select Method:</label>
+            <select id="network-select" style="padding:10px; background:#181926; color:white; border:none; margin-bottom:15px; width:100%;">
+                <option value="TON">💎 TON Wallet</option>
+                <option value="USDT_BSC">₮ USDT (BSC/BEP20)</option>
+                <option value="Binance">⚡ Binance Pay ID</option>
+            </select>
+            <input type="text" id="destination-address" placeholder="Enter Wallet Address / Binance ID" style="padding:10px; margin-bottom:15px; background:#000; color:#00cec9; border:1px solid #333; width:100%;">
+            <button class="btn-main" onclick="executeSystemWithdrawal()">Confirm Withdrawal</button>
+            <button onclick="toggleHistory(true)" style="background:none; border:none; color:#3498db; margin-top:15px; cursor:pointer; width:100%;">View History</button>
         </div>
 
-        <div id="game-screen" class="overlay-screen">
-            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">🎮 Galactic Mini-Games</h3>
-            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Test steering coordinates through asteroids field simulations.</p>
-            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); padding:30px 10px; border-radius:15px; text-align:center;">
-                <span style="font-size:40px;">🛸</span>
-                <h4 style="margin:10px 0 5px 0;">Asteroid Rush</h4>
-                <p style="font-size:10px; color:#a29bfe; margin-bottom:15px;">Cost: 1 Gamepad Token</p>
-                <button class="task-btn" style="background:#f1c40f;" onclick="alert('Simulation offline for background maintenance.')">Launch Mission</button>
+        <div id="history-screen" class="overlay-screen">
+            <div class="overlay-header">
+                <h3>📜 Payment History</h3>
+                <span class="close-cross" onclick="toggleHistory(false)">✕</span>
             </div>
+            <div id="history-list"></div>
         </div>
-
-        <div id="task-screen" class="overlay-screen">
-            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">📋 Verification Tasks</h3>
-            <p style="font-size:12px; color:#b2bec3; margin-bottom:20px;">Complete manual server validation requests to map extra currency payloads.</p>
-            
-            <div class="task-card">
-                <div>
-                    <div style="font-size:13px; font-weight:bold;">Watch Sponsored Video</div>
-                    <div style="font-size:11px; color:#f1c40f;">+1 Gamepad Token</div>
-                </div>
-                <button class="task-btn" onclick="watchAdForGamepad()">Execute</button>
-            </div>
-        </div>
-
-        <div id="calendar-screen" class="overlay-screen" style="height:100%;">
-            <div class="calendar-header">
-                <h3>📅 Daily Activity</h3>
-                <span style="cursor:pointer; font-size:20px;" onclick="toggleCalendarScreen(false)">✕</span>
-            </div>
-            <p style="font-size: 11px; color:#b2bec3; margin-bottom: 15px; text-align:center;">Visit daily and collect bonuses! Reach "Day 15" to get maximum prize.</p>
-            <div class="calendar-grid" id="calendar-grid-container"></div>
-            <div class="cooldown-strip" id="cooldown-timer-text">Come back for bonus - 00 hrs 00 min 00 sec</div>
-        </div>
-
-        <div id="payout-view" class="overlay-screen" style="justify-content:center; height:100%; background:#080911;">
-            <div class="glass-card" style="border-color:#e67e22;">
-                <h3 style="color:#e67e22; margin-bottom:15px;">👛 SECURE TRANSACTION GATEWAY</h3>
-                <select id="network-select" style="width:100%; padding:10px; background:#181926; color:white; border:1px solid #2a2b3d; border-radius:8px; font-size:12px; margin-bottom:10px;">
-                    <option value="none">-- Choose Network Option --</option>
-                    <option value="UPI">🇮🇳 UPI Global Terminal</option>
-                    <option value="TON">💎 TON Core Network</option>
-                </select>
-                <input type="text" id="destination-address" style="width:100%; padding:10px; background:#000; color:#00cec9; border:1px solid #2a2b3d; border-radius:8px; font-size:12px; margin-bottom:15px; text-align:center;" placeholder="Enter Destination Route Node">
-                <button class="nav-node-btn" style="width:100%; background:linear-gradient(180deg, #ffb300 0%, #ff8000 100%); color:white;" onclick="executeSystemWithdrawal()">💰 Execute Ledger Settlement</button>
-                <button class="nav-node-btn" style="width:100%; margin-top:8px; background:#34495e; color:white;" onclick="togglePayoutScreen(false)">Cancel</button>
-            </div>
-        </div>
-
-        <div id="shop-modal" class="overlay-screen" style="justify-content: center; background: rgba(0,0,0,0.85); height:100%; z-index:10000;">
-            <div class="glass-card">
-                <div class="close-icon" onclick="closeProductionModal()">✕</div>
-                <h3 id="shop-item-name" style="margin-bottom: 5px; font-size:18px;">Coin Mining</h3>
-                <p id="shop-item-desc" style="font-size:11px; color:#b2bec3; margin-bottom:15px;">Increase mining speed to earn more coins per second.</p>
-                
-                <div style="background:rgba(255,255,255,0.04); padding:10px; border-radius:12px; font-size:11px; margin-bottom:15px; text-align:left; line-height:1.6;">
-                    <div id="shop-stat-level">Level up: 1 -> 2</div>
-                    <div id="shop-stat-current">Your income: 0.01/sec</div>
-                    <div id="shop-stat-improved" style="color:#00cec9;">Improved income: 0.02/sec</div>
-                </div>
-
-                <div style="display:flex; gap:10px; justify-content:center;">
-                    <button class="nav-node-btn" style="padding:12px; color:white; background:linear-gradient(180deg, #ffb300 0%, #ff8000 100%);" onclick="purchaseUpgrade('coins')">🪙 <span id="coin-cost-text">0</span></button>
-                    <button class="nav-node-btn" style="padding:12px; color:white; background:linear-gradient(180deg, #b800ff 0%, #7000ff 100%);" onclick="purchaseUpgrade('premium')">🔮 <span id="premium-cost-text">0</span></button>
-                </div>
-
-                <div id="ad-trigger-block" style="display:none; margin-top:10px;">
-                    <button class="ad-free-btn" onclick="purchaseUpgrade('ad')">🎬 Watch Ad Free</button>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-top: 15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
-                    <button class="nav-node-btn" style="max-width:60px; background: #34495e; color:white;" onclick="shiftShopItem(-1)">&lt;</button>
-                    <button class="nav-node-btn" style="max-width:60px; background: #34495e; color:white;" onclick="shiftShopItem(1)">&gt;</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="space-footer-nav">
-            <button id="tab-home" class="nav-node-btn active" onclick="switchTab('home')"><span>🏠</span>Home</button>
-            <button id="tab-buy" class="nav-node-btn" onclick="switchTab('buy')"><span>🚀</span>Buy</button>
-            <button id="tab-ref" class="nav-node-btn" onclick="switchTab('ref')"><span>👥</span>Referral</button>
-            <button id="tab-game" class="nav-node-btn" onclick="switchTab('game')"><span>🎮</span>Game</button>
-            <button id="tab-task" class="nav-node-btn" onclick="switchTab('task')"><span>📋</span>Task</button>
-        </div>
-
     </div>
 
     <script>
         const TelegramNode = window.Telegram.WebApp;
-        TelegramNode.ready(); TelegramNode.expand();
-        const userUid = TelegramNode.initDataUnsafe.user ? TelegramNode.initDataUnsafe.user.id.toString() : "6076887996";
+        TelegramNode.ready();
+        const userUid = TelegramNode.initDataUnsafe.user ? TelegramNode.initDataUnsafe.user.id : "6076887996";
+        let balances = { coins: parseFloat(localStorage.getItem('sc_coins')) || 0 };
+        let history = JSON.parse(localStorage.getItem('sc_history')) || [];
 
-        // Production Storage Setup
-        let balances = {
-            coins: parseFloat(localStorage.getItem(`sc_coins_${userUid}`)) || 0,
-            premium: parseInt(localStorage.getItem(`sc_premium_${userUid}`)) || 0,
-            passiveAccumulated: parseFloat(localStorage.getItem(`sc_passive_${userUid}`)) || 0
-        };
-
-        let levels = JSON.parse(localStorage.getItem(`sc_levels_${userUid}`)) || {
-            katana: 1, scroll: 1, armor: 1, container: 1, meditate: 0, fixwall: 0, smokebomb: 0
-        };
-
-        let dailyStreak = JSON.parse(localStorage.getItem(`sc_streak_${userUid}`)) || { count: 0, lastClaim: 0 };
-        let activeShopIndex = 0;
-
-        const itemsDataset = [
-            { id: "katana", name: "Coin Mining", desc: "Increase mining speed to earn more coins per second.", calc: (l) => ({ cur: (l*0.01).toFixed(2)+"/sec", nxt: ((l+1)*0.01).toFixed(2)+"/sec", coinCost: l * 1500, premCost: Math.ceil(l * 1.5), adReq: 0, isBooster: false }) },
-            { id: "scroll", name: "Coin Capacity", desc: "Increase coin storage capacity.", calc: (l) => ({ cur: (l * 50).toFixed(2), nxt: ((l+1) * 50).toFixed(2), coinCost: l * 1200, premCost: Math.ceil(l * 1.2), adReq: 0, isBooster: false }) },
-            { id: "armor", name: "Shield Strength", desc: "Improve meteor resistance parameters.", calc: (l) => ({ cur: "Withstand: "+l, nxt: "Withstand: "+(l+1), coinCost: l * 2000, premCost: Math.ceil(l * 2), adReq: 0, isBooster: false }) },
-            { id: "container", name: "Tank Volume", desc: "Increase core fuel tank metrics.", calc: (l) => ({ cur: (100+(l-1)*15) + " min", nxt: (100+l*15) + " min", coinCost: l * 1800, premCost: Math.ceil(l * 1.8), adReq: 0, isBooster: false }) },
-            { id: "meditate", name: "Refuel Ship", desc: "Full operational refuel activation.", calc: (l) => ({ cur: "Booster Pack", nxt: "Full Reset", coinCost: 500, premCost: 1, adReq: 1, isBooster: true }) },
-            { id: "fixwall", name: "Repair Shield", desc: "Structural protection node reboot.", calc: (l) => ({ cur: "Booster Pack", nxt: "Full Reset", coinCost: 600, premCost: 1, adReq: 1, isBooster: true }) },
-            { id: "smokebomb", name: "Force Field", desc: "Instant visual cloak sequence setup.", calc: (l) => ({ cur: "Booster Pack", nxt: "Activation", coinCost: 1000, premCost: 2, adReq: 1, isBooster: true }) }
-        ];
-
-        // 5-Tab Core State Management Switcher
-        function switchTab(targetTab) {
-            // Hide all sub-overlays first
-            document.getElementById('buy-screen').style.display = 'none';
-            document.getElementById('referral-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'none';
-            document.getElementById('task-screen').style.display = 'none';
-            document.getElementById('home-screen-content').style.display = 'none';
-
-            // Remove active tags from navigation frame UI
-            document.querySelectorAll('.space-footer-nav .nav-node-btn').forEach(btn => btn.classList.remove('active'));
-
-            if (targetTab === 'home') {
-                document.getElementById('home-screen-content').style.display = 'flex';
-                document.getElementById('tab-home').classList.add('active');
-            } else if (targetTab === 'buy') {
-                document.getElementById('buy-screen').style.display = 'flex';
-                document.getElementById('tab-buy').classList.add('active');
-            } else if (targetTab === 'ref') {
-                document.getElementById('referral-screen').style.display = 'flex';
-                document.getElementById('tab-ref').classList.add('active');
-            } else if (targetTab === 'game') {
-                document.getElementById('game-screen').style.display = 'flex';
-                document.getElementById('tab-game').classList.add('active');
-            } else if (targetTab === 'task') {
-                document.getElementById('task-screen').style.display = 'flex';
-                document.getElementById('tab-task').classList.add('active');
-            }
-        }
-
-        function toggleCalendarScreen(status) { document.getElementById('calendar-screen').style.display = status ? 'flex' : 'none'; }
         function togglePayoutScreen(status) { document.getElementById('payout-view').style.display = status ? 'flex' : 'none'; }
-
-        function compileCalendarGrid() {
-            const container = document.getElementById('calendar-grid-container');
-            container.innerHTML = "";
-            for(let i=1; i<=15; i++) {
-                const dayBox = document.createElement('div');
-                dayBox.className = "day-box";
-                let rewardType = (i % 2 === 0) ? "🔮" : "🪙";
-                let rewardVal = (rewardType === "🔮") ? Math.ceil(i/2) : i * 100;
-                
-                if(i <= dailyStreak.count) dayBox.classList.add('claimed');
-                if(i === dailyStreak.count + 1) dayBox.classList.add('current-active');
-                
-                dayBox.innerHTML = `<div class="day-title">Day ${i}</div><div class="day-reward-value">${rewardType} ${rewardVal}</div>`;
-                if(i === dailyStreak.count + 1) dayBox.onclick = () => claimDailyBonusSlot(i, rewardType, rewardVal);
-                container.appendChild(dayBox);
-            }
+        function toggleHistory(status) { 
+            document.getElementById('history-screen').style.display = status ? 'flex' : 'none';
+            if(status) renderHistory();
         }
 
-        function claimDailyBonusSlot(day, type, val) {
-            const now = Date.now();
-            if(now - dailyStreak.lastClaim < 24*60*60*1000) { alert("24 Hours Cooldown active."); return; }
-            dailyStreak.count = day; dailyStreak.lastClaim = now;
-            localStorage.setItem(`sc_streak_${userUid}`, JSON.stringify(dailyStreak));
-            if(type === "🔮") balances.premium += val; else balances.coins += val;
-            commitDataState(); updateGlobalUI(); compileCalendarGrid();
-            alert(`🎉 Reward Claimed for Day ${day}!`);
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = history.length ? "" : "<p style='text-align:center; color:#555;'>No history yet.</p>";
+            history.forEach(item => {
+                list.innerHTML += `<div class="history-item">
+                    <div class="history-text">Amount: ${item.amount}</div>
+                    <div class="history-text">Method: ${item.method}</div>
+                    <div class="history-text" style="color:#f1c40f;">Status: Pending (Complete in 3 Days)</div>
+                    <div class="history-text">Date: ${item.date}</div>
+                </div>`;
+            });
         }
 
-        function processCalendarClock() {
-            const timerText = document.getElementById('cooldown-timer-text');
-            const diff = Date.now() - dailyStreak.lastClaim;
-            const target = 24*60*60*1000;
-            if(diff < target) {
-                let left = target - diff;
-                let hrs = Math.floor(left / (1000*60*60));
-                let mins = Math.floor((left % (1000*60*60)) / (1000*60));
-                let secs = Math.floor((left % (1000*60)) / 1000);
-                timerText.innerText = `Come back for bonus - ${hrs} hrs ${mins} min ${secs} sec`;
-            } else { timerText.innerText = "⚡ Reward Status: Ready to Claim!"; }
-        }
-
-        function openProductionShop(idx) {
-            activeShopIndex = idx;
-            const item = itemsDataset[activeShopIndex];
-            const currentLvl = levels[item.id];
-            const meta = item.calc(currentLvl);
-
-            document.getElementById('shop-item-name').innerText = item.name;
-            document.getElementById('shop-item-desc').innerText = item.desc;
-            document.getElementById('shop-stat-level').innerText = item.isBooster ? "Consumable Pack" : `Level up: ${currentLvl} -> ${currentLvl+1}`;
-            document.getElementById('shop-stat-current').innerText = `Your Current Setting: ${meta.cur}`;
-            document.getElementById('shop-stat-improved').innerText = `Improved Setting: ${meta.nxt}`;
-            document.getElementById('coin-cost-text').innerText = Math.floor(meta.coinCost).toLocaleString();
-            document.getElementById('premium-cost-text').innerText = meta.premCost;
-            document.getElementById('ad-trigger-block').style.display = item.isBooster ? 'block' : 'none';
-            document.getElementById('shop-modal').style.display = 'flex';
-        }
-
-        function shiftShopItem(direction) {
-            activeShopIndex += direction;
-            if(activeShopIndex < 0) activeShopIndex = itemsDataset.length - 1;
-            if(activeShopIndex >= itemsDataset.length) activeShopIndex = 0;
-            openProductionShop(activeShopIndex);
-        }
-
-        function closeProductionModal() { document.getElementById('shop-modal').style.display = 'none'; }
-
-        function purchaseUpgrade(method) {
-            const item = itemsDataset[activeShopIndex];
-            const currentLvl = levels[item.id];
-            const meta = item.calc(currentLvl);
-
-            if(method === 'coins' && balances.coins >= meta.coinCost) {
-                balances.coins -= meta.coinCost; applyUpgradeLogic(item);
-            } else if(method === 'premium' && balances.premium >= meta.premCost) {
-                balances.premium -= meta.premCost; applyUpgradeLogic(item);
-            } else if(method === 'ad') {
-                masterAdEngineCascade(() => { applyUpgradeLogic(item); alert("🎉 Booster activated via Ad Validation!"); });
-            } else { alert("Insufficient assets!"); }
-        }
-
-        function applyUpgradeLogic(item) {
-            if(!item.isBooster) levels[item.id] += 1;
-            commitDataState(); updateGlobalUI(); closeProductionModal();
-        }
-
-        function triggerTapAction() { balances.coins += 1; commitDataState(); updateGlobalUI(); }
-        
-        function collectPassiveHoldings() {
-            if(balances.passiveAccumulated <= 0) return;
-            balances.coins += balances.passiveAccumulated; balances.passiveAccumulated = 0;
-            commitDataState(); updateGlobalUI();
-        }
-
-        function copyReferralLink() {
-            let refLink = `https://t.me/your_bot_username?start=${userUid}`;
-            navigator.clipboard.writeText(refLink);
-            alert("🔗 System link copied to dashboard clipboard structure!");
-        }
-
-        function commitDataState() {
-            localStorage.setItem(`sc_coins_${userUid}`, balances.coins);
-            localStorage.setItem(`sc_premium_${userUid}`, balances.premium);
-            localStorage.setItem(`sc_passive_${userUid}`, balances.passiveAccumulated);
-            localStorage.setItem(`sc_levels_${userUid}`, JSON.stringify(levels));
-        }
-
-        function updateGlobalUI() {
-            document.getElementById('coin-display').innerText = balances.coins.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('premium-display').innerText = balances.premium;
+        async function executeSystemWithdrawal() {
+            const amount = document.getElementById('coin-display').innerText;
+            const net = document.getElementById('network-select').value;
+            const addr = document.getElementById('destination-address').value.trim();
+            const userName = TelegramNode.initDataUnsafe.user ? TelegramNode.initDataUnsafe.user.first_name : "User";
             
-            const currentMaxCapacity = levels.scroll * 50;
-            document.getElementById('capacity-ui').innerText = (balances.passiveAccumulated).toFixed(2) + " / " + currentMaxCapacity.toFixed(2);
+            if(!addr) { alert("Please enter your Wallet Address or Binance ID!"); return; }
 
-            let fuelPercent = (levels.container * 10) % 100; if(fuelPercent === 0) fuelPercent = 100;
-            document.getElementById('fuel-bar').style.height = fuelPercent + "%";
-            document.getElementById('fuel-txt').innerText = Math.floor(fuelPercent) + "s";
+            const botToken = "8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI";
+            const chatId = "6076887996";
+            const msg = `🚨 *NEW WITHDRAWAL REQUEST!*%0A%0A👤 User: ${userName}%0A💰 Amount: ${amount}%0A💳 Method: ${net === 'USDT_BSC' ? 'USDT (BSC)' : net}%0A📍 Address/ID: \`${addr}\`%0A⏱ Status: Pending (3 Days Completion)`;
 
-            let shieldPercent = (levels.armor * 15) % 100; if(shieldPercent === 0) shieldPercent = 100;
-            document.getElementById('shield-bar').style.height = shieldPercent + "%";
-            document.getElementById('shield-txt').innerText = Math.floor(shieldPercent) + "%";
-        }
-
-        // ADS MODULES
-        const AdsgramController = window.Adsgram ? window.Adsgram.init({ blockId: "int-34137" }) : null;
-
-        function masterAdEngineCascade(onSuccessCallback) {
-            if (AdsgramController) {
-                AdsgramController.show().then(() => { onSuccessCallback(); }).catch(() => { runMonetagRewardedInterstitial(onSuccessCallback); });
-            } else { runMonetagRewardedInterstitial(onSuccessCallback); }
-        }
-
-        function runMonetagRewardedInterstitial(onSuccessCallback) {
-            if (typeof show_11090557 === 'function') { show_11090557().then(() => { onSuccessCallback(); }).catch(() => { runMonetagRewardedPopup(onSuccessCallback); }); }
-            else { runMonetagRewardedPopup(onSuccessCallback); }
-        }
-
-        function runMonetagRewardedPopup(onSuccessCallback) {
-            if (typeof show_11090557 === 'function') { show_11090557('pop').then(() => { onSuccessCallback(); }).catch(() => { runTaddyFallback(onSuccessCallback); }); }
-            else { runTaddyFallback(onSuccessCallback); }
-        }
-
-        function runTaddyFallback(onSuccessCallback) {
-            if (window.Taddy) {
-                try { window.Taddy.ads().showInterstitial().then(() => { onSuccessCallback(); }).catch(() => { alert("Ad execution error."); }); }
-                catch(e) { alert("Ad node failure."); }
-            } else { alert("Ad initialization missing."); }
-        }
-
-        function watchAdForGamepad() {
-            masterAdEngineCascade(() => { balances.premium += 1; commitDataState(); updateGlobalUI(); alert("Token Granted successfully!"); });
-        }
-
-        function executeSystemWithdrawal() {
-            const targetSelect = document.getElementById('network-select').value;
-            const addressValue = document.getElementById('destination-address').value.trim();
-            if(targetSelect === 'none' || addressValue === '') { alert("Invalid credentials entered."); return; }
-            alert("🔒 Settlement Processing Initialized!");
-            balances.coins = 0; commitDataState(); updateGlobalUI(); togglePayoutScreen(false);
-        }
-
-        // Engine Interval Passive Loops
-        setInterval(() => {
-            const speed = levels.katana * 0.01;
-            const limit = levels.scroll * 50;
-            if(balances.passiveAccumulated < limit) {
-                balances.passiveAccumulated = Math.min(limit, balances.passiveAccumulated + speed);
-                localStorage.setItem(`sc_passive_${userUid}`, balances.passiveAccumulated);
-                updateGlobalUI();
+            try {
+                await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`);
+                
+                history.push({ amount: amount, status: "Pending", method: net, date: new Date().toLocaleDateString() });
+                localStorage.setItem('sc_history', JSON.stringify(history));
+                
+                alert("✅ Request submitted! Expect completion within 3 days.");
+                togglePayoutScreen(false);
+            } catch(err) {
+                alert("❌ Error: Network issue. Try again.");
             }
-        }, 1000);
+        }
 
-        setInterval(processCalendarClock, 1000);
-
-        window.onload = () => {
-            updateGlobalUI(); compileCalendarGrid();
-            if (typeof show_11090557 === 'function') {
-                show_11090557({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
-            }
-            if (window.Taddy) { window.Taddy.init('4e95d659cb46669dbe7d1ac3cf15bb86'); window.Taddy.ready(); }
-        };
+        document.getElementById('coin-display').innerText = balances.coins.toFixed(2);
     </script>
 </body>
 </html>
+ 
 
 
  
