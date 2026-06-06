@@ -6,111 +6,135 @@
     <title>Space Adventure - Premium Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Orbitron', sans-serif; user-select: none; }
-        body { background: #0b0c16; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 420px; height: 100vh; background: radial-gradient(circle at center, #1b133a 0%, #080911 100%); border: 2px solid #2a1b54; position: relative; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
-        
-        .overlay-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0b0c16; z-index: 999; flex-direction: column; padding: 20px; overflow-y: auto; }
-        .overlay-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .close-cross { cursor: pointer; font-size: 24px; color: #ff7675; }
-        
-        .history-item { background: #181926; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #f1c40f; }
-        .history-text { font-size: 11px; color: #b2bec3; margin-bottom: 3px; }
-        .btn-main { background: linear-gradient(180deg, #ffb300, #ff8000); color: white; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
-        
-        /* Default Home screen visible rakhne ke liye */
-        .home-ui { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
     <div class="app-container">
+        <!-- Home Screen -->
         <div id="home-screen" class="home-ui">
-            <div style="font-size: 50px; margin-bottom: 20px;">🚀</div>
-            <h2 id="coin-display">0.00</h2>
-            <button class="btn-main" onclick="togglePayoutScreen(true)" style="margin-top:20px;">Withdrawal Portal</button>
+            <div class="emoji-icon">🚀</div>
+            <h2 id="coin-display" aria-label="Current coin balance">0.00</h2>
+            <p class="balance-label">Available Balance</p>
+            <button class="btn-main" id="withdrawal-btn" aria-label="Open withdrawal portal">
+                Withdrawal Portal
+            </button>
+            <button class="btn-secondary" id="history-btn" aria-label="View transaction history">
+                📜 View History
+            </button>
         </div>
 
-        <div id="payout-view" class="overlay-screen">
+        <!-- Withdrawal Modal -->
+        <div id="payout-view" class="overlay-screen" role="dialog" aria-labelledby="withdrawal-title">
             <div class="overlay-header">
-                <h3>👛 Withdrawal Gateway</h3>
-                <span class="close-cross" onclick="togglePayoutScreen(false)">✕</span>
+                <h3 id="withdrawal-title">👛 Withdrawal Gateway</h3>
+                <button class="close-cross" id="close-payout" aria-label="Close withdrawal portal">✕</button>
             </div>
-            <label style="font-size:10px; color:#888;">Select Method:</label>
-            <select id="network-select" style="padding:10px; background:#181926; color:white; border:none; margin-bottom:15px; width:100%;">
-                <option value="TON">💎 TON Wallet</option>
-                <option value="USDT_BSC">₮ USDT (BSC/BEP20)</option>
-                <option value="Binance">⚡ Binance Pay ID</option>
-            </select>
-            <input type="text" id="destination-address" placeholder="Enter Wallet Address / Binance ID" style="padding:10px; margin-bottom:15px; background:#000; color:#00cec9; border:1px solid #333; width:100%;">
-            <button class="btn-main" onclick="executeSystemWithdrawal()">Confirm Withdrawal</button>
-            <button onclick="toggleHistory(true)" style="background:none; border:none; color:#3498db; margin-top:15px; cursor:pointer; width:100%;">View History</button>
+
+            <!-- Step 1: Select Method -->
+            <div id="step-1" class="withdrawal-step">
+                <label for="network-select" class="input-label">Select Withdrawal Method:</label>
+                <select id="network-select" aria-label="Select withdrawal method">
+                    <option value="TON">💎 TON Wallet</option>
+                    <option value="USDT_BSC">₮ USDT (BSC/BEP20)</option>
+                    <option value="Binance">⚡ Binance Pay ID</option>
+                </select>
+                <p class="method-info" id="method-info"></p>
+                <button class="btn-main" id="next-step-1" aria-label="Proceed to next step">
+                    Next →
+                </button>
+            </div>
+
+            <!-- Step 2: Enter Address -->
+            <div id="step-2" class="withdrawal-step" style="display: none;">
+                <label for="destination-address" class="input-label">Enter Wallet Address / ID:</label>
+                <input 
+                    type="text" 
+                    id="destination-address" 
+                    placeholder="Paste your wallet address or Binance ID"
+                    aria-label="Wallet address or Binance ID"
+                >
+                <p class="error-message" id="address-error"></p>
+                <div class="step-buttons">
+                    <button class="btn-secondary" id="back-step-2" aria-label="Go back">
+                        ← Back
+                    </button>
+                    <button class="btn-main" id="next-step-2" aria-label="Proceed to review">
+                        Next →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Review & Confirm -->
+            <div id="step-3" class="withdrawal-step" style="display: none;">
+                <h4>Review Your Withdrawal</h4>
+                <div class="review-box">
+                    <div class="review-item">
+                        <span>Amount:</span>
+                        <strong id="review-amount">0.00</strong>
+                    </div>
+                    <div class="review-item">
+                        <span>Method:</span>
+                        <strong id="review-method">-</strong>
+                    </div>
+                    <div class="review-item">
+                        <span>Address:</span>
+                        <strong id="review-address" style="word-break: break-all;">-</strong>
+                    </div>
+                    <div class="review-item">
+                        <span>Status:</span>
+                        <strong style="color: #f1c40f;">Pending</strong>
+                    </div>
+                    <div class="review-item">
+                        <span>Est. Time:</span>
+                        <strong>3-5 Days</strong>
+                    </div>
+                </div>
+                <p class="warning-message">⚠️ Double-check your address before confirming. Withdrawals cannot be reversed.</p>
+                <div class="step-buttons">
+                    <button class="btn-secondary" id="back-step-3" aria-label="Go back">
+                        ← Back
+                    </button>
+                    <button class="btn-main" id="confirm-withdrawal" aria-label="Confirm and submit withdrawal">
+                        Confirm Withdrawal
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="withdrawal-step" style="display: none;">
+                <div class="spinner"></div>
+                <p>Processing your withdrawal...</p>
+            </div>
+
+            <!-- Success State -->
+            <div id="success-state" class="withdrawal-step" style="display: none;">
+                <div class="success-icon">✅</div>
+                <h3>Request Submitted!</h3>
+                <p>Your withdrawal request has been received. Check your history for updates.</p>
+                <button class="btn-main" id="done-btn" aria-label="Close and return to home">
+                    Done
+                </button>
+            </div>
         </div>
 
-        <div id="history-screen" class="overlay-screen">
+        <!-- History Modal -->
+        <div id="history-screen" class="overlay-screen" role="dialog" aria-labelledby="history-title">
             <div class="overlay-header">
-                <h3>📜 Payment History</h3>
-                <span class="close-cross" onclick="toggleHistory(false)">✕</span>
+                <h3 id="history-title">📜 Payment History</h3>
+                <button class="close-cross" id="close-history" aria-label="Close history">✕</button>
             </div>
             <div id="history-list"></div>
         </div>
+
+        <!-- Error Toast -->
+        <div id="error-toast" class="toast" role="alert"></div>
     </div>
 
-    <script>
-        const TelegramNode = window.Telegram.WebApp;
-        TelegramNode.ready();
-        
-        // Default state: Withdrawal hidden rakha hai
-        document.getElementById('payout-view').style.display = 'none';
-
-        let balances = { coins: parseFloat(localStorage.getItem('sc_coins')) || 0 };
-        let history = JSON.parse(localStorage.getItem('sc_history')) || [];
-
-        function togglePayoutScreen(status) { 
-            document.getElementById('payout-view').style.display = status ? 'flex' : 'none'; 
-        }
-        
-        function toggleHistory(status) { 
-            document.getElementById('history-screen').style.display = status ? 'flex' : 'none';
-            if(status) renderHistory();
-        }
-
-        // ... (Baaki functions wahi purane wale hain, koi change nahi)
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = history.length ? "" : "<p style='text-align:center; color:#555;'>No history yet.</p>";
-            history.forEach(item => {
-                list.innerHTML += `<div class="history-item">
-                    <div class="history-text">Amount: ${item.amount}</div>
-                    <div class="history-text">Method: ${item.method}</div>
-                    <div class="history-text" style="color:#f1c40f;">Status: Pending (Complete in 3 Days)</div>
-                </div>`;
-            });
-        }
-
-        async function executeSystemWithdrawal() {
-            const amount = document.getElementById('coin-display').innerText;
-            const net = document.getElementById('network-select').value;
-            const addr = document.getElementById('destination-address').value.trim();
-            
-            if(!addr) { alert("Enter address!"); return; }
-
-            const botToken = "8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI";
-            const chatId = "6076887996";
-            const msg = `🚨 *NEW WITHDRAWAL!*%0AAmount: ${amount}%0AMethod: ${net}%0AAddress: ${addr}%0AStatus: Pending (3 Days)`;
-
-            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`);
-
-            history.push({ amount: amount, status: "Pending", method: net, date: new Date().toLocaleDateString() });
-            localStorage.setItem('sc_history', JSON.stringify(history));
-            
-            alert("✅ Request submitted!");
-            togglePayoutScreen(false);
-        }
-
-        document.getElementById('coin-display').innerText = balances.coins.toFixed(2);
-    </script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/withdrawal.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
 
