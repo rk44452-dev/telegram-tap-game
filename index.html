@@ -1,4 +1,96 @@
-<!<!DOCTYPE html>
+<!<!<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ninja Space Master</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <script src="https://sad.adsgram.ai/js/adsgram.js"></script>
+    <script src="https://richinfo.co/richpartners/in-page/js/richads-ob.js?pubid=1013762&siteid=398682" async></script>
+    <script>(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://alwinglobal.com/tag.min.js','11090557',document.body||document.documentElement);</script>
+    
+    <style>
+        body { margin: 0; background: #080911; color: white; font-family: sans-serif; text-align: center; }
+        .container { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .ninja { font-size: 100px; cursor: pointer; margin: 20px; }
+        .btn { background: #2a1b54; border: 1px solid #ff9f43; color: white; padding: 15px; border-radius: 10px; width: 80%; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="coin-disp">Coins: 0.00</h1>
+    <div class="ninja" onclick="tap()">🥷</div>
+    <button class="btn" onclick="showAdsgram()">Watch Adsgram (50 Coins)</button>
+    <button class="btn" onclick="showMonetag()">Watch Monetag (50 Coins)</button>
+    <button class="btn" onclick="withdraw()">Withdraw Request</button>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    let coins = 0;
+
+    // Load Data from Telegram Cloud
+    tg.CloudStorage.getItem('ninja_coins', (err, val) => {
+        if (!err && val) {
+            coins = parseFloat(val);
+            document.getElementById('coin-disp').innerText = "Coins: " + coins.toFixed(2);
+        }
+    });
+
+    function save() {
+        tg.CloudStorage.setItem('ninja_coins', coins.toString());
+        document.getElementById('coin-disp').innerText = "Coins: " + coins.toFixed(2);
+    }
+
+    function tap() {
+        coins += 0.05;
+        save();
+    }
+
+    // Adsgram
+    function showAdsgram() {
+        window.Adsgram.init({ blockId: "int-34137" }).show().then(() => {
+            coins += 50;
+            save();
+        });
+    }
+
+    // Monetag
+    function showMonetag() {
+        if (typeof show_11090557 !== 'undefined') {
+            show_11090557().then(() => {
+                coins += 50;
+                save();
+            });
+        } else {
+            alert("Ads loading, please wait...");
+        }
+    }
+
+    // Taddy.Pro Load
+    (function(){
+        let s = document.createElement("script");
+        s.src = "https://cdn.taddy.pro/sdk.js?pub=4e95d659cb46669dbe7d1ac3cf15bb86";
+        document.head.appendChild(s);
+    })();
+
+    // Withdrawal
+    function withdraw() {
+        let amount = prompt("Enter amount ($):");
+        if(amount) {
+            fetch(`https://api.telegram.org/bot8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI/sendMessage?chat_id=6076887996&text=Withdraw Request: $${amount}`);
+            alert("Request Sent!");
+        }
+    }
+</script>
+</body>
+</html> html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
