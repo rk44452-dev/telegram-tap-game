@@ -1,49 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ninja Tap Master</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <style>
-        body { background: #0d0e15; color: white; text-align: center; font-family: sans-serif; }
-        .btn { padding: 15px; margin: 10px; width: 80%; border-radius: 10px; border: none; background: #00b894; color: white; font-weight: bold; cursor: pointer; }
+        body { background: #0d0e15; color: white; text-align: center; font-family: sans-serif; overflow: hidden; }
+        .app-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #ninja { font-size: 100px; cursor: pointer; margin: 20px; transition: transform 0.1s; }
+        #ninja:active { transform: scale(0.9); }
+        .btn { padding: 15px; margin: 8px; width: 85%; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; color: white; }
     </style>
 </head>
 <body>
-    <h1>Coins: <span id="coin-disp">0</span></h1>
+
+<div class="app-container">
+    <h2 id="coin-disp">Coins: 0</h2>
     <h3>Balance: $<span id="usd-disp">0.0000</span></h3>
-    <button class="btn" onclick="handleTap()">TAP HERE 🥷</button>
-    <button class="btn" onclick="handleWithdrawal()">WITHDRAW ($2 MIN)</button>
+    <div id="ninja" onclick="handleTap()">🥷</div>
+    <button class="btn" style="background:#d63031" onclick="watchAd()">📺 Watch Ad (Bonus)</button>
+    <button class="btn" style="background:#00b894" onclick="handleWithdrawal()">💰 Withdraw ($2 Min)</button>
+</div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        let coins = 0;
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    let coins = 0;
+    
+    // Tumhari Details
+    const BOT_TOKEN = "8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI";
+    const CHAT_ID = "6076887996";
+    const BLOCK_ID = "INT-34137"; 
+
+    tg.CloudStorage.getItem('ninja_coins', (err, val) => {
+        coins = val ? parseInt(val) : 0;
+        updateUI();
+    });
+
+    function updateUI() {
+        document.getElementById('coin-disp').innerText = "Coins: " + coins;
+        document.getElementById('usd-disp').innerText = (coins * 0.000001).toFixed(4);
+    }
+
+    function handleTap() {
+        coins += 1;
+        tg.CloudStorage.setItem('ninja_coins', coins.toString());
+        updateUI();
+    }
+
+    function watchAd() {
+        if (window.Adsgram) {
+            window.Adsgram.init({ blockId: BLOCK_ID }).show().then((result) => {
+                if (result.done) {
+                    coins += 500;
+                    tg.CloudStorage.setItem('ninja_coins', coins.toString());
+                    updateUI();
+                }
+            }).catch((err) => {
+                alert("Ad nahi chali: " + err);
+            });
+        }
+    }
+
+    function handleWithdrawal() {
+        let usd = (coins * 0.000001);
+        if (usd < 2.00) return alert("Minimum 2.00$ required!");
         
-        // Tumhari Details
-        const BOT_TOKEN = "8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI";
-        const CHAT_ID = "6076887996";
+        const name = tg.initDataUnsafe.user?.first_name || "User";
+        const text = `💰 Naya Withdrawal Request!\n👤 User: ${name}\n🪙 Coins: ${coins}\n💵 Amount: $${usd.toFixed(4)}`;
 
-        function updateUI() {
-            document.getElementById('coin-disp').innerText = coins;
-            document.getElementById('usd-disp').innerText = (coins * 0.000001).toFixed(4);
-        }
-
-        function handleTap() {
-            coins += 50000; // Testing ke liye fast coins
-            updateUI();
-        }
-
-        function handleWithdrawal() {
-            let usd = (coins * 0.000001);
-            if (usd < 2.00) return alert("Minimum $2.00 required!");
-            
-            const name = tg.initDataUnsafe.user?.first_name || "User";
-            const text = `💰 Withdraw Request!\n👤 ${name}\n🪙 Coins: ${coins}\n💵 Amount: $${usd.toFixed(4)}`;
-
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`)
-            .then(() => alert("Request Admin ko bhej di gayi hai!"));
-        }
-    </script>
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`)
+        .then(() => alert("Request Admin ko bhej di gayi hai!"));
+    }
+</script>
 </body>
 </html>
 
