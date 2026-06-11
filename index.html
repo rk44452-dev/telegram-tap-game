@@ -1,490 +1,87 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ninja Tap & Earn</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&display=swap" rel="stylesheet">
-    
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ninja Tap Master</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Orbitron', sans-serif;
-            user-select: none;
-        }
-
-        body {
-            background: #0d0e15;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 420px;
-            height: 100vh;
-            background: radial-gradient(circle at center, #1e1233 0%, #0d0e15 100%);
-            border: 2px solid #391c6d;
-            position: relative;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-box {
-            font-size: 11px;
-            color: #a29bfe;
-        }
-
-        .stat-val {
-            font-size: 14px;
-            color: #00cec9;
-            font-weight: bold;
-        }
-
-        .score-board {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .coin-balance {
-            font-size: 34px;
-            color: #fdcb6e;
-            text-shadow: 0 0 20px rgba(253, 203, 110, 0.5);
-            margin-bottom: 2px;
-        }
-
-        .usd-balance {
-            font-size: 18px;
-            color: #2ecc71;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
-        }
-
-        .click-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-grow: 1;
-        }
-
-        .character-glow {
-            width: 170px;
-            height: 170px;
-            background: rgba(0, 206, 201, 0.1);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 30px rgba(0, 206, 201, 0.2);
-            border: 2px solid #00cec9;
-            cursor: pointer;
-            transition: transform 0.05s;
-        }
-
-        .character-glow:active {
-            transform: scale(0.92);
-            background: rgba(0, 206, 201, 0.2);
-        }
-
-        .character-emoji {
-            font-size: 90px;
-            filter: drop-shadow(0 0 10px #00cec9);
-        }
-
-        .energy-section {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .energy-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            margin-bottom: 5px;
-            color: #dfe6e9;
-        }
-
-        .progress-bar-bg {
-            width: 100%;
-            height: 10px;
-            background: #2d3436;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .progress-bar-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #00cec9, #0984e3);
-            transition: width 0.1s ease;
-        }
-
-        /* Referral UI Box */
-        .referral-box {
-            background: rgba(162, 155, 254, 0.06);
-            border: 1px dashed #6c5ce7;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .ref-title {
-            font-size: 11px;
-            color: #a29bfe;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .ref-btn {
-            width: 100%;
-            padding: 8px;
-            background: #6c5ce7;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .wallet-container {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 5px;
-        }
-
-        .wallet-title {
-            font-size: 10px;
-            color: #a29bfe;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-
-        .wallet-select {
-            width: 100%;
-            padding: 8px;
-            background: #171821;
-            color: white;
-            border: 1px solid #391c6d;
-            border-radius: 8px;
-            font-size: 11px;
-            margin-bottom: 8px;
-            outline: none;
-        }
-
-        .input-box {
-            display: none;
-            margin-bottom: 8px;
-        }
-
-        .dynamic-input {
-            width: 100%;
-            padding: 8px;
-            background: #0d0e15;
-            color: #00cec9;
-            border: 1px solid #391c6d;
-            border-radius: 6px;
-            font-size: 11px;
-            outline: none;
-        }
-
-        .action-container {
-            display: flex;
-            gap: 8px;
-        }
-
-        .game-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            font-size: 11px;
-            cursor: pointer;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .btn-ad {
-            background: linear-gradient(135deg, #d63031, #e17055);
-        }
-
-        .btn-withdraw {
-            background: linear-gradient(135deg, #00b894, #00cec9);
-        }
+        body { background: #0d0e15; color: white; text-align: center; font-family: 'Orbitron', sans-serif; overflow: hidden; }
+        .app-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #ninja { font-size: 100px; cursor: pointer; margin: 20px; transition: transform 0.1s; }
+        #ninja:active { transform: scale(0.9); }
+        .btn { padding: 15px; margin: 8px; width: 85%; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+<div class="app-container">
+    <h2 id="coin-disp">Coins: 0</h2>
+    <h3>Balance: $<span id="usd-disp">0.0000</span></h3>
+    <div id="ninja" onclick="handleTap()">🥷</div>
+    <button class="btn" style="background:#d63031" onclick="watchAd()">📺 Watch Ad (Bonus)</button>
+    <button class="btn" style="background:#00b894" onclick="handleWithdrawal()">💰 Withdraw ($2 Min)</button>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    let coins = 0;
+    
+    // Telegram Bot Details (Tumhari Details)
+    const BOT_TOKEN = "8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI";
+    const CHAT_ID = "6076887996";
+
+    // Data load from Cloud
+    tg.CloudStorage.getItem('ninja_coins', (err, val) => {
+        coins = val ? parseInt(val) : 0;
+        updateUI();
+    });
+
+    function updateUI() {
+        document.getElementById('coin-disp').innerText = "Coins: " + coins;
+        document.getElementById('usd-disp').innerText = (coins * 0.000001).toFixed(4);
+    }
+
+    function handleTap() {
+        coins += 1;
+        tg.CloudStorage.setItem('ninja_coins', coins.toString());
+        updateUI();
+    }
+
+    function watchAd() {
+        if (window.Adsgram) {
+            window.Adsgram.init({ blockId: "int-34137" }).show().then(() => {
+                coins += 500;
+                tg.CloudStorage.setItem('ninja_coins', coins.toString());
+                updateUI();
+            });
+        } else {
+            alert("Ads not loaded yet!");
+        }
+    }
+
+    function handleWithdrawal() {
+        let usd = (coins * 0.000001);
+        if (usd < 2.00) return alert("Minimum 2.00$ required!");
         
-        <div class="top-bar">
-            <div class="stat-box">Rate<br><span class="stat-val">10K = $1</span></div>
-            <div class="stat-box" style="text-align: right;">Ref Bonus<br><span class="stat-val">+$0.20</span></div>
-        </div>
+        const name = tg.initDataUnsafe.user?.first_name || "User";
+        const id = tg.initDataUnsafe.user?.id || "N/A";
+        const text = `💰 Naya Withdrawal Request!\n👤 User: ${name} (ID: ${id})\n🪙 Coins: ${coins}\n💵 Amount: $${usd.toFixed(4)}`;
 
-        <div class="score-board">
-            <div class="coin-balance">🪙 <span id="coin-count">0</span></div>
-            <div class="usd-balance">≈ $<span id="usd-count">0.00</span></div>
-        </div>
-
-        <div class="click-area">
-            <div class="character-glow" onclick="handleTap(event)">
-                <div class="character-emoji">🥷</div>
-            </div>
-        </div>
-
-        <div class="energy-section">
-            <div class="energy-text">
-                <span>⚡ Energy</span>
-                <span><span id="energy-count">100</span>/100</span>
-            </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="energy-bar"></div>
-            </div>
-        </div>
-
-        <div class="referral-box">
-            <div class="ref-title">🔗 Invite Friends & Get $0.20 (2,000 Coins)</div>
-            <button class="ref-btn" onclick="copyReferralLink()">📋 Copy My Referral Link</button>
-        </div>
-
-        <div class="wallet-container">
-            <div class="wallet-title">👛 Choose Payout Method</div>
-            <select id="wallet-select" class="wallet-select" onchange="handleSelectChange()">
-                <option value="none">-- Choose Option --</option>
-                <option value="UPI">🇮🇳 UPI (Paytm/PhonePe/GPay)</option>
-                <option value="Tonkeeper">💎 Tonkeeper Wallet</option>
-            </select>
-
-            <div id="payout-input-container" class="input-box">
-                <input type="text" id="payout-address" class="dynamic-input" placeholder="">
-            </div>
-
-            <div class="action-container">
-                <button class="game-btn btn-ad" id="ad-btn" onclick="watchAdToRefill()">📺 Refill (Ad)</button>
-                <button class="game-btn btn-withdraw" id="withdraw-btn" onclick="handleWithdrawal()">💰 Withdraw</button>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        const WebApp = window.Telegram.WebApp;
-        WebApp.ready();
-        WebApp.expand();
-
-        const userTelegramName = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.first_name : "Ninja User";
-        const userTelegramID = WebApp.initDataUnsafe.user ? WebApp.initDataUnsafe.user.id : "777777";
-
-        // Game Metrics Configuration
-        const CONVERSION_RATE = 10000; // 10,000 Coins = $1
-        const REF_BONUS_COINS = 2000;  // 2,000 Coins = $0.20
-        const MIN_WITHDRAW_USD = 5;
-
-        // LocalStorage logic for state persistence
-        let coins = parseInt(localStorage.getItem(`coins_${userTelegramID}`)) || 0;
-        let energy = 100;
-        let lastTapTime = 0;
-        const MAX_SPEED_LIMIT = 60;
-
-        // --- DYNAMIC REFERRAL CHECK ENGINE ---
-        function checkReferral() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const referrer = urlParams.get('tgWebAppStartParam') || urlParams.get('ref');
-            
-            // Check if user is newly referred and didn't claim bonus yet
-            if (referrer && referrer !== userTelegramID) {
-                const alreadyClaimed = localStorage.getItem(`ref_claimed_${userTelegramID}`);
-                if (!alreadyClaimed) {
-                    coins += REF_BONUS_COINS;
-                    localStorage.setItem(`ref_claimed_${userTelegramID}`, "true");
-                    localStorage.setItem(`coins_${userTelegramID}`, coins);
-                    
-                    // Alerting user nicely inside Telegram WebApp
-                    setTimeout(() => {
-                        alert(`🎉 Referral Bonus Applied!\nYou got +2,000 Coins ($0.20) for joining via Invite Link.`);
-                        updateUI();
-                    }, 1000);
-                }
-            }
-        }
-
-        function copyReferralLink() {
-            // Generates native deep link structure for Telegram Mini App Bots
-            const botUsername = "Ninjatapgamebot"; // <-- YAHAN APNE BOT KA USERNAME DALNA (Bina @ ke)
-            const referralLink = `https://t.me/${botUsername}/start?startapp=${userTelegramID}`;
-            
-            navigator.clipboard.writeText(referralLink).then(() => {
-                alert("🚀 Link copied! Send it to your friends.\nWhen they join and tap, you both get bonuses.");
-            }).catch(() => {
-                // Fail-safe manual input backup selection fallback
-                alert(`Share this link:\n${referralLink}`);
-            });
-        }
-
-        function handleTap(event) {
-            const currentTime = Date.now();
-            if (lastTapTime !== 0 && (currentTime - lastTapTime < MAX_SPEED_LIMIT)) {
-                alert("⚠️ Anti-Cheat Triggered!");
-                return; 
-            }
-            lastTapTime = currentTime;
-
-            if (energy > 0) {
-                coins += 5; 
-                energy -= 2; 
-                if (energy < 0) energy = 0;
-                localStorage.setItem(`coins_${userTelegramID}`, coins);
-                updateUI();
-            } else {
-                alert("Out of Energy! Tap 'Refill' to view an ad.");
-            }
-        }
-
-        function handleSelectChange() {
-            const selectedOpt = document.getElementById('wallet-select').value;
-            const inputContainer = document.getElementById('payout-input-container');
-            const inputField = document.getElementById('payout-address');
-            
-            if (selectedOpt === 'none') {
-                inputContainer.style.display = 'none';
-            } else {
-                inputContainer.style.display = 'block';
-                inputField.placeholder = selectedOpt === 'UPI' ? "Enter UPI ID (e.g., vpa@paytm)" : "Enter TON Wallet Address";
-            }
-        }
-
-        // --- ADSGRAM ENGINE BINDING ---
-        const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "int-34137" }) : null;
-
-        function watchAdToRefill() {
-            if (!AdController) {
-                alert("Ads SDK is offline. Run inside Telegram Client.");
-                return;
-            }
-
-            const adBtn = document.getElementById('ad-btn');
-            adBtn.innerText = "Loading Ad...";
-            adBtn.disabled = true;
-
-            AdController.show().then(() => {
-                energy = 100;
-                updateUI();
-                alert('🎉 Success! Energy full 100%!');
-            }).catch((result) => {
-                alert('Ad skipped or Network Busy. Try again later.');
-                console.error("Adsgram tracking object logs:", result);
-            }).finally(() => {
-                adBtn.innerText = "📺 Refill (Ad)";
-                adBtn.disabled = false;
-            });
-        }
-
-        function handleWithdrawal() {
-            const selectedMethod = document.getElementById('wallet-select').value;
-            const addressValue = document.getElementById('payout-address').value.trim();
-            const currentUSD = coins / CONVERSION_RATE;
-
-            if (selectedMethod === "none" || addressValue === "") {
-                alert("Kripya saari Details select aur fill karein!");
-                return;
-            }
-
-            if (currentUSD < MIN_WITHDRAW_USD) {
-                alert(`Min limit $${MIN_WITHDRAW_USD} required.`);
-                return;
-            }
-
-            const urlParams = new URLSearchParams(window.location.search);
-            let googleScriptID = urlParams.get('sheet') || "AKfycbxi_YOUR_REAL_ID_HERE";
-
-            const googleScriptURL = `https://script.google.com/macros/s/${googleScriptID}/exec`;
-
-            const wBtn = document.getElementById('withdraw-btn');
-            wBtn.innerText = "Processing...";
-            wBtn.disabled = true;
-
-            const payload = {
-                tgName: userTelegramName,
-                tgId: userTelegramID,
-                coinAmount: coins,
-                usdAmount: currentUSD.toFixed(2),
-                method: selectedMethod,
-                payoutDetails: addressValue
-            };
-
-            fetch(googleScriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                alert(`🎉 Payout Request Sent!`);
-                coins = 0; 
-                localStorage.setItem(`coins_${userTelegramID}`, coins);
-                updateUI();
-            })
-            .catch(() => {
-                alert("Server Connection Error.");
-            })
-            .finally(() => {
-                wBtn.innerText = "💰 Withdraw";
-                wBtn.disabled = false;
-            });
-        }
-
-        function updateUI() {
-            document.getElementById('coin-count').innerText = coins.toLocaleString();
-            document.getElementById('energy-count').innerText = energy;
-            document.getElementById('energy-bar').style.width = energy + "%";
-            let usdValue = coins / CONVERSION_RATE;
-            document.getElementById('usd-count').innerText = usdValue.toFixed(2);
-        }
-
-        // Energy ticking recovery thread
-        setInterval(() => {
-            if (energy < 100) {
-                energy += 1;
-                updateUI();
-            }
-        }, 12000);
-
-        // Initial Runtime Execution
-        window.onload = () => {
-            updateUI();
-            checkReferral();
-        };
-    </script>
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`)
+        .then(() => alert("Request Admin ko bhej di gayi hai! Check your bot."));
+    }
+</script>
 </body>
 </html>
+
+
+
+
 
 
 
