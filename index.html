@@ -43,11 +43,11 @@
 
     function updateUI() {
         document.getElementById('coin-disp').innerText = "Coins: " + coins;
-        document.getElementById('usd-disp').innerText = (coins * 0.5000001).toFixed(4);
+        document.getElementById('usd-disp').innerText = (coins * 0.000001).toFixed(4);
     }
 
     function handleTap() {
-        coins += 1;
+        coins += 500000;
         tg.CloudStorage.setItem('ninja_coins', coins.toString());
         updateUI();
     }
@@ -65,7 +65,7 @@
     }
 
     function handleWithdrawal() {
-        let usd = (coins * 0.5000001);
+        let usd = (coins * 0.000001);
         if (usd < 2.00) return alert("Minimum 2.00$ required!");
         
         const name = tg.initDataUnsafe.user?.first_name || "User";
