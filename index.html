@@ -54,7 +54,7 @@
 
     function watchAd() {
         if (window.Adsgram) {
-            window.Adsgram.ini {int-34137 }.show().then((result) => {
+            window.Adsgram.ini({blockid: "int-34137" }).show().then((result) => {
                 if (result.done) {
                     coins += 500;
                     tg.CloudStorage.setItem('ninja_coins', coins.toString());
