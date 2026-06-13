@@ -2,84 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ninja Tap Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ninja Tap Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <script src="https://sad.adsgram.ai/js/adsgram.min.js"></script>
     <style>
-        body { background: #0d0e15; color: white; text-align: center; font-family: sans-serif; overflow: hidden; }
-        .app-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        #ninja { font-size: 100px; cursor: pointer; margin: 20px; transition: transform 0.1s; }
-        #ninja:active { transform: scale(0.9); }
-        .btn { padding: 15px; margin: 8px; width: 85%; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; color: white; }
+        body { text-align: center; font-family: 'Arial', sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        .stats { font-size: 1.2rem; margin-bottom: 20px; background: #2d2d2d; padding: 15px; border-radius: 15px; }
+        #ninja { width: 140px; margin: 20px 0; cursor: pointer; transition: 0.2s; }
+        #ninja:active { transform: scale(0.95); }
+        .btn { padding: 12px 20px; background: #e67e22; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin: 5px; width: 90%; }
+        .task-card { background: #333; padding: 15px; margin: 10px 0; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <h2 id="coin-disp">Coins: 0</h2>
-    <h3>Balance: $<span id="usd-disp">0.0000</span></h3>
-    <div id="ninja" onclick="handleTap()">🥷</div>
-    <button class="btn" style="background:#d63031" onclick="watchAd()">📺 Watch Ad (Bonus)</button>
-    <button class="btn" style="background:#00b894" onclick="handleWithdrawal()">💰 Withdraw ($2 Min)</button>
-</div>
+    <div class="stats">
+        <h2 id="rank">Rank: Novice Ninja</h2>
+        <h1 id="coin-disp">Coins: 0</h1>
+        <h2 id="energy-disp">Energy: 1000/1000</h2>
+    </div>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    <img id="ninja" src="https://cdn-icons-png.flaticon.com/512/3048/3048122.png" onclick="handleTap()">
 
-    let coins = 0;
-    
-    // Tumhari Details
-    const BOT_TOKEN = "8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI";
-    const CHAT_ID = "6076887996";
-    const BLOCK_ID = "INT-34137"; 
+    <div id="tasks">
+        <h3>🎯 Daily Tasks</h3>
+        <div class="task-card">
+            <p>Watch Reward Ad (+500 Coins)</p>
+            <button class="btn" onclick="showAd('reward')">Watch Reward (35068)</button>
+        </div>
+        <div class="task-card">
+            <p>Watch Interstitial Ad (+200 Coins)</p>
+            <button class="btn" style="background:#27ae60;" onclick="showAd('inter')">Watch Interstitial (int-34137)</button>
+        </div>
+    </div>
 
-    tg.CloudStorage.getItem('ninja_coins', (err, val) => {
-        coins = val ? parseInt(val) : 0;
-        updateUI();
-    });
+    <script>
+        let coins = parseInt(localStorage.getItem('coins')) || 0;
+        let energy = parseInt(localStorage.getItem('energy')) || 1000;
 
-    function updateUI() {
-        document.getElementById('coin-disp').innerText = "Coins: " + coins;
-        document.getElementById('usd-disp').innerText = (coins * 0.000001).toFixed(4);
-    }
-
-    function handleTap() {
-        coins += 1;
-        tg.CloudStorage.setItem('ninja_coins', coins.toString());
-        updateUI();
-    }
-
-    function watchAd() {
-        if (window.Adsgram) {
-window.Adsgram.ini({blockid: "int-34137" }).show().then((result) => {
-            
-                    coins += 500;
-                    tg.CloudStorage.setItem('ninja_coins', coins.toString());
-                    updateUI();
-                }
-            }).catch((err) => {
-                alert("Ad nahi chali: " + err);
-            });
+        function updateUI() {
+            document.getElementById('coin-disp').innerText = "Coins: " + coins;
+            document.getElementById('energy-disp').innerText = "Energy: " + energy + "/1000";
+            let rank = coins > 20000 ? "Master Ninja" : (coins > 5000 ? "Warrior Ninja" : "Novice Ninja");
+            document.getElementById('rank').innerText = "Rank: " + rank;
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('energy', energy);
         }
-    }
 
-    function handleWithdrawal() {
-        let usd = (coins * 0.000001);
-        if (usd < 2.00) return alert("Minimum 2.00$ required!");
-        
-        const name = tg.initDataUnsafe.user?.first_name || "User";
-        const text = `💰 Naya Withdrawal Request!\n👤 User: ${name}\n🪙 Coins: ${coins}\n💵 Amount: $${usd.toFixed(4)}`;
+        function handleTap() {
+            if (energy > 0) {
+                coins += 1;
+                energy -= 1;
+                updateUI();
+            } else {
+                alert("Energy khatam! Task complete karo.");
+            }
+        }
 
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`)
-        .then(() => alert("Request Admin ko bhej di gayi hai!"));
-    }
-</script>
+        function showAd(type) {
+            const blockId = (type === 'reward') ? "35068" : "int-34137";
+            if (window.Adsgram) {
+                window.Adsgram.init({ blockId: blockId }).show()
+                .then((result) => {
+                    if (result.done) {
+                        coins += (type === 'reward' ? 500 : 200);
+                        energy = 1000;
+                        updateUI();
+                        alert("Task Complete! Reward added.");
+                    }
+                });
+            }
+        }
+
+        // Auto-recharge
+        setInterval(() => { if (energy < 1000) { energy += 1; updateUI(); } }, 2000);
+        updateUI();
+    </script>
 </body>
 </html>
-
 
     
     
