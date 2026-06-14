@@ -3,15 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ninja Tap Pro - Final</title>
+    <title>Ninja Tap Pro</title>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0d0e15; color: white; font-family: sans-serif; text-align: center; padding: 10px; }
-        .card { background: #1c1f2e; padding: 15px; border-radius: 15px; margin: 10px 0; border: 1px solid #333; }
-        .btn { padding: 12px; width: 100%; background: #6c5ce7; border: none; color: white; border-radius: 8px; margin-top: 5px; cursor: pointer; }
-        .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        #warning-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        body { 
+            background: #0d0e15; 
+            color: white; 
+            font-family: sans-serif; 
+            text-align: center; 
+            padding: 10px; 
+            margin: 0;
+            padding-bottom: 80px;
+        }
+        .card { 
+            background: #1c1f2e; 
+            padding: 15px; 
+            border-radius: 15px; 
+            margin: 10px 0; 
+            border: 1px solid #333; 
+        }
+        .btn { 
+            padding: 12px; 
+            width: 100%; 
+            background: #6c5ce7; 
+            border: none; 
+            color: white; 
+            border-radius: 8px; 
+            margin-top: 8px; 
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .withdraw-option {
+            background: #2a2f45;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #1c1f2e;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .nav-item.active { color: #6c5ce7; }
+        .nav-item i { font-size: 24px; margin-bottom: 4px; }
+
+        #ninja-img {
+            width: 180px;
+            height: 180px;
+            font-size: 120px;
+            cursor: pointer;
+            margin: 15px auto;
+            transition: transform 0.1s;
+        }
+        #ninja-img:active { transform: scale(0.85); }
     </style>
 </head>
 <body>
@@ -23,96 +85,226 @@
     </div>
 
     <div id="game-ui" style="display:none;">
-        <h1 id="coin-disp">Coins: 0</h1>
-        <button class="btn" onclick="handleTap()">TAP NINJA (+2)</button>
 
-        <div class="section-grid">
+        <!-- EARN SECTION -->
+        <div id="earn-section" class="section active">
+            <h1 id="coin-disp">Coins: 0</h1>
+            <h2 id="energy-disp">Energy: 500/500</h2>
+            
+            <div id="ninja-img" onclick="handleTap()">🥷</div>
+            <p style="margin:5px; font-size:16px;">Tap on Ninja (+2 Coins)</p>
+
             <div class="card">
-                <h4>🎰 Spin</h4>
-                <button class="btn" onclick="spinWheel()">Spin (100c)</button>
+                <h4>🎰 Spin Wheel</h4>
+                <div id="wheel-container">
+                    <div class="pointer">▼</div>
+                    <div id="wheel"></div>
+                </div>
+                <button class="btn" onclick="spinWheel()">Spin (100 Coins)</button>
             </div>
+
             <div class="card">
-                <h4>💰 Withdraw</h4>
-                <button class="btn" style="background:#00b894;" onclick="handleWithdrawal()">Request Pay</button>
+                <h4>💰 Withdrawal</h4>
+                <p style="color:#00ff9d; font-size:14px;">1 Coin = 0.00005 USDT</p>
+                <p style="font-size:13px;">Minimum: 20,000 Coins (1 USDT)</p>
+                
+                <div class="withdraw-option" onclick="selectMethod('USDT BSC')">
+                    <strong>USDT (BSC)</strong><br>
+                    <small>Low fees • Fast</small>
+                </div>
+                <div class="withdraw-option" onclick="selectMethod('Binance Pay')">
+                    <strong>Binance Pay</strong><br>
+                    <small>Easy & Secure</small>
+                </div>
+                <div class="withdraw-option" onclick="selectMethod('TON')">
+                    <strong>TON</strong><br>
+                    <small>Very Low Fees (Recommended)</small>
+                </div>
+
+                <button class="btn" style="background:#00b894; margin-top:15px;" onclick="handleWithdrawal()">
+                    Request Withdrawal
+                </button>
             </div>
         </div>
 
-        <div class="card">
+        <!-- TASKS SECTION -->
+        <div id="tasks-section" class="section">
             <h3>🎯 Daily Tasks</h3>
-            <button class="btn" onclick="playAdsgram('rewarded')">Video Ad (+300)</button>
-            <button class="btn" onclick="playMonetag()">Premium Task (+300)</button>
+            <div class="card">
+                <button class="btn" onclick="watchAdForEnergy()">📺 Watch Ad - Full Energy</button>
+                <button class="btn" onclick="playMonetag()">⭐ Premium Task (+300 Coins)</button>
+            </div>
         </div>
+
+        <!-- DICE SECTION -->
+        <div id="dice-section" class="section">
+            <h3>🔋 Energy & Referral</h3>
+            <div class="card">
+                <h4>🔋 Buy Full Energy</h4>
+                <button class="btn" onclick="buyEnergy()">200 Coins se Full Energy</button>
+            </div>
+            <div class="card">
+                <h4>🔗 Referral</h4>
+                <button class="btn" onclick="copyReferral()">Copy Referral Link</button>
+                <p id="referral-link" style="font-size:13px; margin-top:10px; word-break:break-all;"></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab(0)" id="nav-tasks">📋<br>TASKS</div>
+        <div class="nav-item" onclick="switchTab(1)" id="nav-earn">▶️<br>EARN</div>
+        <div class="nav-item" onclick="switchTab(2)" id="nav-dice">🎲<br>DICE</div>
     </div>
 
     <script>
         const WebApp = window.Telegram.WebApp;
         WebApp.ready();
         
-        // TUMHARI DETAILS
         const BOT_TOKEN = "8340157634:AAEMQQyxpgz4rb4u7kZWMVq3S6NSnixk0uI";
         const ADMIN_ID = "6076887996";
         
         let coins = 0;
+        let energy = 500;
+        let maxEnergy = 500;
         let lastTapTime = 0;
+        let selectedMethod = "TON"; // Default low fee
 
         function acceptWarning() { 
             document.getElementById('warning-modal').style.display = 'none'; 
             document.getElementById('game-ui').style.display = 'block';
             loadData();
+            updateReferralLink();
         }
 
-        function loadData() { WebApp.CloudStorage.getItem('coins', (e, v) => { if(v) coins = parseInt(v); updateUI(); }); }
+        function loadData() {
+            WebApp.CloudStorage.getItem('coins', (e, v) => { if(v) coins = parseInt(v); updateUI(); });
+            WebApp.CloudStorage.getItem('energy', (e, v) => { if(v) energy = parseInt(v); updateUI(); });
+        }
 
         function handleTap() {
-            if (Date.now() - lastTapTime < 250) return alert("❌ Auto-clicker detected!");
+            if (energy <= 0) return alert("❌ Energy khatam! Ad dekho ya coins spend karke refill karo.");
+            if (Date.now() - lastTapTime < 250) return alert("❌ Bahut jaldi tap mat karo!");
+
             lastTapTime = Date.now();
             coins += 2;
+            energy -= 1;
             WebApp.CloudStorage.setItem('coins', coins.toString());
+            WebApp.CloudStorage.setItem('energy', energy.toString());
             updateUI();
         }
 
-        // WITHDRAWAL LOGIC
+        function spinWheel() {
+            if (coins < 100) return alert("100 Coins chahiye spin ke liye!");
+            coins -= 100;
+            updateUI();
+
+            const wheel = document.getElementById('wheel');
+            wheel.classList.add('spinning');
+
+            setTimeout(() => {
+                wheel.classList.remove('spinning');
+                const win = Math.floor(Math.random() * 500) + 150;
+                coins += win;
+                alert(`🎉 Jackpot! Aap jeet gaye ${win} Coins!`);
+                updateUI();
+            }, 3000);
+        }
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            alert(`✅ ${method} selected for withdrawal`);
+        }
+
         async function handleWithdrawal() {
-            if(coins < 1000) return alert("Minimum 1000 coins chahiye!");
+            if(coins < 20000) return alert("Minimum 20,000 coins chahiye (1 USDT)!");
+
             const name = WebApp.initDataUnsafe.user?.first_name || "User";
             const id = WebApp.initDataUnsafe.user?.id || "Unknown";
+            const usdtAmount = (coins * 0.00005).toFixed(4);
             
-            const msg = `🔔 New Withdraw Request!\n👤 User: ${name}\n🆔 ID: ${id}\n💰 Amount: ${coins} coins`;
-            
+            const msg = `🔔 New Withdrawal Request!\n` +
+                        `👤 User: ${name}\n` +
+                        `🆔 ID: ${id}\n` +
+                        `💰 Coins: ${coins} (${usdtAmount} USDT)\n` +
+                        `💸 Method: ${selectedMethod}\n` +
+                        `📍 Recommended: TON (Lowest Fees)`;
+
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_ID}&text=${encodeURIComponent(msg)}`);
             
-            alert("✅ Request Admin ko bhej di gayi hai!");
+            alert(`✅ ${selectedMethod} Withdrawal request bhej di gayi hai!`);
             coins = 0;
             WebApp.CloudStorage.setItem('coins', '0');
             updateUI();
         }
 
-        function spinWheel() {
-            if (coins < 100) return alert("Kam coins!");
-            coins -= 100;
-            coins += Math.floor(Math.random() * 500);
-            updateUI();
+        // Baaki functions (watchAdForEnergy, buyEnergy, playMonetag, copyReferral, etc.)
+        function watchAdForEnergy() {
+            const controller = window.Adsgram.init({ blockId: "35068" });
+            controller.show().then(res => { 
+                if(res.done) { 
+                    energy = maxEnergy;
+                    WebApp.CloudStorage.setItem('energy', energy.toString());
+                    updateUI();
+                    alert("✅ Full Energy Refilled!");
+                } 
+            });
         }
 
-        function playAdsgram(type) {
-            const controller = window.Adsgram.init({ blockId: "35068" });
-            controller.show().then(res => { if(res.done) { coins += 300; updateUI(); } });
+        function buyEnergy() {
+            if (coins < 200) return alert("200 Coins chahiye!");
+            coins -= 200;
+            energy = maxEnergy;
+            WebApp.CloudStorage.setItem('coins', coins.toString());
+            WebApp.CloudStorage.setItem('energy', energy.toString());
+            updateUI();
+            alert("✅ Energy full ho gayi!");
         }
 
         function playMonetag() {
-            // Monetag script function
             if(typeof show_11090557 !== 'undefined') {
                 show_11090557('pop').then(() => { coins += 300; updateUI(); });
             } else { alert("Ad load ho rahi hai..."); }
         }
 
-        function updateUI() { document.getElementById('coin-disp').innerText = "Coins: " + coins; }
+        function copyReferral() {
+            const userId = WebApp.initDataUnsafe.user?.id || "123456";
+            const link = `https://t.me/ninjatapgamebot?start=${userId}`;
+            navigator.clipboard.writeText(link).then(() => alert("✅ Referral link copied!"));
+        }
+
+        function updateReferralLink() {
+            const userId = WebApp.initDataUnsafe.user?.id || "123456";
+            document.getElementById('referral-link').textContent = `https://t.me/ninjatapgamebot?start=${userId}`;
+        }
+
+        function updateUI() {
+            document.getElementById('coin-disp').innerText = `Coins: ${coins}`;
+            document.getElementById('energy-disp').innerText = `Energy: ${energy}/${maxEnergy}`;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            if (tab === 0) {
+                document.getElementById('tasks-section').classList.add('active');
+                document.getElementById('nav-tasks').classList.add('active');
+            } else if (tab === 1) {
+                document.getElementById('earn-section').classList.add('active');
+                document.getElementById('nav-earn').classList.add('active');
+            } else if (tab === 2) {
+                document.getElementById('dice-section').classList.add('active');
+                document.getElementById('nav-dice').classList.add('active');
+            }
+        }
+
+        window.onload = () => { WebApp.expand(); };
     </script>
 </body>
 </html>
-
-                
-
 
 
 
