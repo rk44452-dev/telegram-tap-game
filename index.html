@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ninja Tap Pro</title>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background: #0d0e15; color: white; font-family: sans-serif; text-align: center; margin: 0; padding-bottom: 80px; }
+       .card { background: #1c1f2e; padding: 15px; border-radius: 15px; margin: 10px; border: 1px solid #333; }
+       .btn { padding: 15px; width: 90%; background: #6c5ce7; border: none; color: white; border-radius: 10px; margin: 10px 0; font-weight: bold; cursor: pointer; }
+       .btn:disabled { background: #555; cursor: not-allowed; }
+       .section { display: none; padding-top: 20px; }
+       .section.active { display: block; }
+       .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #1c1f2e; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; }
+       .nav-item { color: #aaa; cursor: pointer; font-size: 12px; }
+       .nav-item.active { color: #6c5ce7; }
+        #ninja-img { font-size: 100px; cursor: pointer; user-select: none; transition: transform 0.1s; }
+        #ninja-img:active { transform: scale(0.9); }
+        input, select { padding:12px; width:80%; margin-bottom:10px; border-radius:8px; border:1px solid #333; background:#2a2f45; color:white; }
+        #spin-result { font-size: 20px; font-weight: bold; margin-top: 10px; min-height: 30px; }
+    </style>
+</head>
+<body>
+
+    <div id="game-ui">
+        <div id="home-section" class="section active">
+            <h1 id="coin-disp">Coins: 0</h1>
+            <h2 id="energy-disp">Energy: 500/500</h2>
+            <div id="ninja-img" onclick="handleTap()">🥷</div>
+            <p>Tap on Ninja (+2 Coins)</p>
+        </div>
+
+        <div id="spin-section" class="section">
+            <h3>🎰 Spin Wheel</h3>
+            <div id="wheel-container" style="height:200px; display:flex; align-items:center; justify-content:center; background:#1c1f2e; margin:20px; border-radius:50%;">
+                <span style="font-size:40px;">🎡</span>
+            </div>
+            <div id="spin-result"></div>
+            <button class="btn" onclick="spinWheelPaid()">💰 Spin (500 Coins)</button>
+        </div>
+
+        <div id="referral-section" class="section">
+            <h3>🔗 Invite Friends</h3>
+            <div class="card">
+                <p id="referral-link" style="word-break: break-all; background: #2a2f45; padding: 10px; border-radius: 8px;"></p>
+                <button class="btn" onclick="copyReferral()">Copy Referral Link</button>
+            </div>
+        </div>
+
+        <div id="tasks-section" class="section">
+            <h3>🎯 Daily Tasks</h3>
+            <button class="btn" id="ad-btn" onclick="watchAdForEnergy()">📺 Watch Ad for +50 Energy</button>
+        </div>
+
+        <div id="withdrawal-section" class="section">
+            <h3>💰 Withdraw</h3>
+            <select id="coin-type">
+                <option value="USDT">USDT - BEP20</option>
+                <option value="BNB">BNB - BEP20</option>
+            </select>
+            <input type="text" id="wallet" placeholder="Wallet Address">
+            <input type="number" id="amount" placeholder="Amount (Min 10000 Coins)">
+            <button class="btn" style="background:#00b894;" onclick="handleWithdrawal()">Request Withdrawal</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab(0)">🏠<br>Home</div>
+        <div class="nav-item" onclick="switchTab(1)">🎰<br>Spin</div>
+        <div class="nav-item" onclick="switchTab(2)">🔗<br>Refer</div>
+        <div class="nav-item" onclick="switchTab(3)">📋<br>Tasks</div>
+        <div class="nav-item" onclick="switchTab(4)">💰<br>Withdraw</div>
+    </div>
+
+    <script>
+        const WebApp = window.Telegram.WebApp;
+        WebApp.ready();
+        WebApp.expand(); // Full screen ke liye
+
+        let coins = 0, energy = 500;
+        const MIN_WITHDRAW = 10000;
+
+        function updateUI() {
+            document.getElementById('coin-disp').innerText = "Coins: " + coins;
+            document.getElementById('energy-disp').innerText = "Energy: " + energy + "/500";
+        }
+
+        function handleTap() {
+            if (energy <= 0) {
+                WebApp.showAlert("❌ No energy! Watch an ad to refill.");
+                return;
+            }
+            coins += 2;
+            energy -= 1;
+            updateUI();
+            WebApp.HapticFeedback.impactOccurred('light'); // Tap pe vibration
+        }
+
+        function spinWheelPaid() {
+            if (coins < 500) {
+                WebApp.showAlert("Not enough coins! You need 500 coins to spin.");
+                return;
+            }
+            coins -= 500;
+            updateUI();
+            let win = Math.floor(Math.random() * 500) + 50; // Min 50 jeetoge
+            coins += win;
+            updateUI();
+            document.getElementById('spin-result').innerText = `🎉 You won ${win} coins!`;
+            WebApp.HapticFeedback.notificationOccurred('success');
+        }
+
+        function copyReferral() {
+            const userId = WebApp.initDataUnsafe.user?.id || "USER_ID";
+            const link = `https://t.me/ninjatapgamebot?start=${userId}`;
+
+            // Telegram me copy karne ka best tarika
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(link).then(() => {
+                    WebApp.showAlert("Link copied!");
+                });
+            } else {
+                // Fallback for Telegram
+                const textArea = document.createElement("textarea");
+                textArea.value = link;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    WebApp.showAlert("Link copied!");
+                } catch (err) {
+                    WebApp.showAlert("Failed to copy. Link: " + link);
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function updateReferralLink() {
+            const userId = WebApp.initDataUnsafe.user?.id || "USER_ID";
+            document.getElementById('referral-link').innerText = `https://t.me/ninjatapgamebot?start=${userId}`;
+        }
+
+        function watchAdForEnergy() {
+            document.getElementById('ad-btn').disabled = true;
+            document.getElementById('ad-btn').innerText = "Loading Ad...";
+
+            // Adsgram integration - ye sirf example hai
+            // Asli ad ke liye Adsgram ka docs dekhna padega
+            setTimeout(() => {
+                energy = Math.min(500, energy + 50);
+                updateUI();
+                WebApp.showAlert("✅ +50 Energy added!");
+                document.getElementById('ad-btn').disabled = false;
+                document.getElementById('ad-btn').innerText = "📺 Watch Ad for +50 Energy";
+            }, 2000);
+        }
+
+        function handleWithdrawal() {
+            const wallet = document.getElementById('wallet').value.trim();
+            const amount = parseInt(document.getElementById('amount').value);
+            const coinType = document.getElementById('coin-type').value;
+
+            if (!wallet) return WebApp.showAlert("Enter wallet address");
+            if (!amount || amount < MIN_WITHDRAW) return WebApp.showAlert(`Minimum withdrawal is ${MIN_WITHDRAW} coins`);
+            if (coins < amount) return WebApp.showAlert("Not enough coins!");
+
+            // Yaha tu backend ko data bhejega
+            const data = { action: "withdraw", wallet, amount, coinType };
+            WebApp.sendData(JSON.stringify(data)); // Bot ko data bhej dega
+
+            coins -= amount;
+            updateUI();
+            WebApp.showAlert("Withdrawal request sent! We will process it soon.");
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.section')[tab].classList.add('active');
+            document.querySelectorAll('.nav-item')[tab].classList.add('active');
+            WebApp.HapticFeedback.selectionChanged();
+        }
+
+        window.onload = () => {
+            updateUI();
+            updateReferralLink();
+        };
+    </script>
+</body>
+</html>
