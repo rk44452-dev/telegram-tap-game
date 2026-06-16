@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ninja Tap Pro</title>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Monetag -->
+    <script src="//libtl.com/sdk.js" data-zone="11090557" data-sdk="show_11090557" async></script>
+    
+    <!-- Taddy.pro (Aapki ID) -->
+    <script src="https://sdk.taddy.pro/web/taddy.min.js" data-pub-id="4e95d659cb46669dbe7d1ac3cf15bb86" async></script>
+    
+    <!-- Richads -->
+    <script src="https://richinfo.co/richpartners/in-page/js/richads-ob.js?pubid=1013762&siteid=398682" async></script>
+
+    <style>
+        body { background: #0d0e15; color: white; font-family: sans-serif; text-align: center; padding: 10px; margin: 0; padding-bottom: 70px; }
+        .card { background: #1c1f2e; padding: 15px; border-radius: 15px; margin: 10px 0; border: 1px solid #333; }
+        .btn { padding: 12px; width: 100%; background: #6c5ce7; border: none; color: white; border-radius: 8px; margin-top: 8px; cursor: pointer; font-weight: bold; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1c1f2e; border-top: 1px solid #333;
+            display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000;
+        }
+        .nav-item { color: #aaa; font-size: 11px; cursor: pointer; }
+        .nav-item.active { color: #6c5ce7; }
+    </style>
+</head>
+<body>
+
+    <div id="warning-modal">
+        <h2>⚠️ SECURITY ALERT</h2>
+        <p>Auto-Clicker & Fake Referrals = Permanent Ban!</p>
+        <button class="btn" onclick="acceptWarning()">I AGREE & START</button>
+    </div>
+
+    <div id="game-ui" style="display:none;">
+
+        <!-- HOME -->
+        <div id="home-section" class="section active">
+            <h1 id="coin-disp">Coins: 0</h1>
+            <h2 id="energy-disp">Energy: 500/500</h2>
+            <div id="ninja-img" onclick="handleTap()">🥷</div>
+            <p style="margin:8px; font-size:18px;">Tap on Ninja (+2 Coins)</p>
+        </div>
+
+        <!-- SPIN -->
+        <div id="spin-section" class="section">
+            <h3>🎰 Spin Wheel</h3>
+            <div id="wheel-container">
+                <div class="pointer">▼</div>
+                <div id="wheel"></div>
+            </div>
+            <button class="btn" style="background:#6c5ce7;" onclick="spinWheelPaid()">💰 Spin (500 Coins)</button>
+            <button class="btn" style="background:#00b894;" onclick="spinWheelFree()">📺 Free Spin (AdsGram)</button>
+        </div>
+
+        <!-- REFERRAL -->
+        <div id="referral-section" class="section">
+            <h3>🔗 Referral (0.2 USDT each)</h3>
+            <div class="card">
+                <button class="btn" onclick="copyReferral()">Copy Referral Link</button>
+                <p id="referral-link" style="font-size:13px; margin-top:15px; word-break:break-all; background:#2a2f45; padding:12px; border-radius:8px;"></p>
+            </div>
+        </div>
+
+        <!-- TASKS -->
+        <div id="tasks-section" class="section">
+            <h3>🎯 Daily Tasks</h3>
+            <div class="card">
+                <button class="btn" onclick="watchAdForEnergy()">📺 AdsGram - Full Energy</button>
+                <button class="btn" style="background:#e74c3c;" onclick="playMonetag()">💰 Monetag (+300)</button>
+                <button class="btn" style="background:#f39c12;" onclick="playRichads()">🔥 Richads (+300)</button>
+                <button class="btn" style="background:#9b59b6;" onclick="playTaddy()">⭐ Taddy.pro (+300)</button>
+            </div>
+        </div>
+
+        <!-- WITHDRAWAL -->
+        <div id="withdrawal-section" class="section">
+            <h3>💰 Withdrawal</h3>
+            <div class="card">
+                <p style="color:#00ff9d;">1 Coin = 0.00005 USDT</p>
+                <p style="color:#ffd700;">Minimum: 20,000 Coins (1 USDT)</p>
+                <div class="withdraw-option" onclick="selectMethod('USDT BSC')">USDT (BSC)</div>
+                <div class="withdraw-option" onclick="selectMethod('Binance Pay')">Binance Pay</div>
+                <div class="withdraw-option" onclick="selectMethod('TON')">TON (Recommended)</div>
+                <input type="text" id="wallet-address" placeholder="Wallet Address Yahan Paste Karo">
+                <button class="btn" style="background:#00b894;" onclick="handleWithdrawal()">Request Withdrawal</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab(0)" id="nav-home">🏠<br>Home</div>
+        <div class="nav-item" onclick="switchTab(1)" id="nav-spin">🎰<br>Spin</div>
+        <div class="nav-item" onclick="switchTab(2)" id="nav-referral">🔗<br>Referral</div>
+        <div class="nav-item" onclick="switchTab(3)" id="nav-tasks">📋<br>Tasks</div>
+        <div class="nav-item" onclick="switchTab(4)" id="nav-withdraw">💰<br>Withdraw</div>
+    </div>
+
+    <script>
+        const WebApp = window.Telegram.WebApp;
+        WebApp.ready();
+
+        let coins = 0;
+        let energy = 500;
+        let maxEnergy = 500;
+        let lastTapTime = 0;
+        let selectedMethod = "TON";
+
+        function acceptWarning() { 
+            document.getElementById('warning-modal').style.display = 'none'; 
+            document.getElementById('game-ui').style.display = 'block';
+            loadProgress();
+            updateReferralLink();
+        }
+
+        function loadProgress() {
+            WebApp.CloudStorage.getItem('coins', (e, v) => { if(v) coins = parseInt(v) || 0; updateUI(); });
+            WebApp.CloudStorage.getItem('energy', (e, v) => { if(v) energy = parseInt(v) || 500; updateUI(); });
+        }
+
+        function saveProgress() {
+            WebApp.CloudStorage.setItem('coins', coins.toString());
+            WebApp.CloudStorage.setItem('energy', energy.toString());
+        }
+
+        function handleTap() {
+            if (energy <= 0) return alert("❌ Energy khatam!");
+            if (Date.now() - lastTapTime < 250) return alert("❌ Bahut jaldi tap mat karo!");
+
+            lastTapTime = Date.now();
+            coins += 2;
+            energy -= 1;
+            saveProgress();
+            updateUI();
+        }
+
+        function spinWheelPaid() {
+            if (coins < 500) return alert("500 Coins chahiye!");
+            coins -= 500;
+            saveProgress();
+            updateUI();
+            startWheelAnimation();
+        }
+
+        function spinWheelFree() {
+            const controller = window.Adsgram.init({ blockId: "int-34137" });
+            controller.show().then(res => { if(res.done) startWheelAnimation(); });
+        }
+
+        function startWheelAnimation() {
+            const wheel = document.getElementById('wheel');
+            const randomDegrees = Math.floor(Math.random() * 360) + 2880;
+            wheel.style.transform = `rotate(${randomDegrees}deg)`;
+
+            setTimeout(() => {
+                const prizes = [100,150,200,250,300,350,400,450,500];
+                const win = prizes[Math.floor(Math.random() * prizes.length)];
+                coins += win;
+                saveProgress();
+                updateUI();
+                alert(`🎉 Aap jeet gaye ${win} Coins!`);
+            }, 4200);
+        }
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            alert(`✅ ${method} selected`);
+        }
+
+        async function handleWithdrawal() {
+            if (coins < 20000) return alert("Minimum 20,000 coins chahiye!");
+            const address = document.getElementById('wallet-address').value.trim();
+            if (!address) return alert("Wallet address daal do!");
+            alert(`✅ Request Sent!\nMethod: ${selectedMethod}\nAddress: ${address}`);
+            coins = 0;
+            saveProgress();
+            updateUI();
+            document.getElementById('wallet-address').value = "";
+        }
+
+        function playMonetag() {
+            if (typeof show_11090557 !== 'undefined') {
+                show_11090557().then(() => { coins += 300; saveProgress(); updateUI(); alert("✅ Monetag +300 Coins"); });
+            } else alert("Monetag loading...");
+        }
+
+        function playRichads() {
+            if (typeof RichAds !== 'undefined') {
+                RichAds.show({ zoneId: 398682, onReward: () => { coins += 300; saveProgress(); updateUI(); alert("✅ Richads +300"); }});
+            } else alert("Richads loading...");
+        }
+
+        function playTaddy() {
+            if (typeof Taddy !== 'undefined') {
+                Taddy.showRewardedAd({ onReward: () => { coins += 300; saveProgress(); updateUI(); alert("✅ Taddy.pro +300 Coins"); }});
+            } else alert("Taddy loading...");
+        }
+
+        function watchAdForEnergy() {
+            const controller = window.Adsgram.init({ blockId: "int-34137" });
+            controller.show().then(res => { 
+                if(res.done) { energy = maxEnergy; saveProgress(); updateUI(); alert("✅ Full Energy Refilled!"); } 
+            });
+        }
+
+        function buyEnergy() {
+            if (coins < 200) return alert("200 Coins chahiye!");
+            coins -= 200;
+            energy = maxEnergy;
+            saveProgress();
+            updateUI();
+            alert("✅ Energy full!");
+        }
+
+        function copyReferral() {
+            const userId = WebApp.initDataUnsafe.user?.id || "123456";
+            const link = `https://t.me/ninjatapgamebot?start=${userId}`;
+            navigator.clipboard.writeText(link).then(() => alert("✅ Referral Link Copied!\n0.2 USDT per referral"));
+        }
+
+        function updateReferralLink() {
+            const userId = WebApp.initDataUnsafe.user?.id || "123456";
+            document.getElementById('referral-link').textContent = `https://t.me/ninjatapgamebot?start=${userId}`;
+        }
+
+        function updateUI() {
+            document.getElementById('coin-disp').innerText = `Coins: ${coins}`;
+            document.getElementById('energy-disp').innerText = `Energy: \( {energy}/ \){maxEnergy}`;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            if(tab === 0) document.getElementById('home-section').classList.add('active'), document.getElementById('nav-home').classList.add('active');
+            else if(tab === 1) document.getElementById('spin-section').classList.add('active'), document.getElementById('nav-spin').classList.add('active');
+            else if(tab === 2) document.getElementById('referral-section').classList.add('active'), document.getElementById('nav-referral').classList.add('active');
+            else if(tab === 3) document.getElementById('tasks-section').classList.add('active'), document.getElementById('nav-tasks').classList.add('active');
+            else if(tab === 4) document.getElementById('withdrawal-section').classList.add('active'), document.getElementById('nav-withdraw').classList.add('active');
+        }
+
+        window.onload = () => { WebApp.expand(); };
+    </script>
+</body>
+</html>
