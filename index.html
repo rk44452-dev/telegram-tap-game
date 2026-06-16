@@ -102,31 +102,34 @@
     }
 
     // Withdrawal Logic
-    function handleWithdrawal() {
-        let addr = document.getElementById('wallet').value;
-        let method = document.querySelector('input[name="method"]:checked').value;
-        if(!addr) return alert("Enter address!");
-        if(coins < 10000) return alert("Min 10,000 coins required!");
-        alert("✅ Request sent for " + method + " to " + addr);
-    }
+   function handleWithdrawal() {
+    let addr = document.getElementById('wallet').value;
+    // Yeh check karta hai ki user ne kaunsa method select kiya hai
+    let method = document.querySelector('input[name="method"]:checked').value;
+    
+    if(!addr) return alert("Enter address!");
+    if(coins < 10000) return alert("Min 10,000 coins required!");
 
+    // Yahan apna Google Web App URL paste karo (jo tumne banaya hoga)
+    let url = "YOUR_GOOGLE_SCRIPT_URL_HERE"; 
+
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+            name: WebApp.initDataUnsafe.user?.first_name || "User",
+            coins: coins,
+            method: method,
+            address: addr
+        })
+    }).then(() => {
+        alert("✅ Request submitted successfully! We will contact you.");
+    }).catch(err => alert("Error: " + err));
+}
     // Navigation
     function showPage(id) {
         document.querySelectorAll('.page').forEach((p, i) => p.classList.toggle('active', i === id));
         document.querySelectorAll('.nav-item').forEach((n, i) => n.classList.toggle('active', i === id));
     }
 </script>
-
-    <
-
-        
-
-            ;
-      
-      
-    
-
-            
-
 </body>
 </html>
